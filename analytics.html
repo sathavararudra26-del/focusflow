@@ -1,405 +1,461 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, Area, CartesianGrid 
-} from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO 
-} from 'date-fns';
-import { 
-  TrendingUp, Target, Clock, Zap, CheckCircle2, ChevronLeft, ChevronRight, Layout 
-} from 'lucide-react';
-
-/**
- * UI COMPONENTS (Bundled for a single-file experience)
- */
-
-// StatCard Component
-const StatCard = ({ label, value, sublabel, icon: Icon }) => (
-  <div className="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200">
-    <div className="flex items-center justify-between mb-2">
-      <div className="p-2 bg-neutral-50 rounded-lg">
-        <Icon className="w-5 h-5 text-neutral-600" />
-      </div>
-    </div>
-    <div>
-      <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{label}</p>
-      <h4 className="text-xl font-bold text-neutral-900 mt-0.5">{value}</h4>
-      <p className="text-[10px] text-neutral-400 mt-1 font-medium">{sublabel}</p>
-    </div>
-  </div>
-);
-
-// StreakCalendar Component (Updated with Tooltips and Date Labels)
-const StreakCalendar = ({ dailyLogs }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [hoveredDate, setHoveredDate] = useState(null);
-  
-  const days = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
-    end: endOfMonth(currentMonth),
-  });
-
-  const getLogForDate = (date) => {
-    return dailyLogs.find(l => isSameDay(parseISO(l.date), date));
-  };
-
-  const getDayStatus = (date) => {
-    const log = getLogForDate(date);
-    if (!log) return 0;
-    if (log.tasks_completed > 5) return 3;
-    if (log.tasks_completed > 2) return 2;
-    return 1;
-  };
-
-  const statusColors = [
-    'bg-neutral-100', // 0: No activity
-    'bg-emerald-200', // 1: Low activity
-    'bg-emerald-400', // 2: Medium activity
-    'bg-emerald-600', // 3: High activity
-  ];
-
-  return (
-    <div className="bg-white border border-neutral-100 rounded-xl p-6 shadow-sm relative">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h3 className="text-sm font-semibold text-neutral-900">Consistency Calendar</h3>
-          <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">Monthly Activity Heatmap</p>
-        </div>
-        <div className="flex gap-2 items-center">
-          <button onClick={() => setCurrentMonth(subDays(startOfMonth(currentMonth), 1))} className="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <span className="text-xs font-bold min-w-[90px] text-center text-neutral-700">{format(currentMonth, 'MMMM yyyy')}</span>
-          <button onClick={() => setCurrentMonth(startOfMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)))} className="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Grid Container */}
-      <div className="grid grid-cols-7 gap-x-2 gap-y-4 max-w-2xl mx-auto">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d, i) => (
-          <div key={i} className="text-[9px] font-bold text-neutral-400 text-center uppercase tracking-tighter mb-1">{d}</div>
-        ))}
-        {days.map((day, i) => {
-          const log = getLogForDate(day);
-          const tasks = log?.tasks_completed || 0;
-          const status = getDayStatus(day);
-          
-          return (
-            <div key={i} className="flex flex-col items-center gap-1 group relative">
-              {/* Tooltip on Hover */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 whitespace-nowrap shadow-xl">
-                {format(day, 'MMM do')}: {tasks} tasks
-              </div>
-              
-              {/* Heat Cell - Smaller Size */}
-              <div
-                className={`w-6 h-6 sm:w-8 sm:h-8 rounded-md ${statusColors[status]} transition-all duration-200 cursor-pointer hover:ring-2 hover:ring-neutral-300`}
-              />
-              
-              {/* Date Label Underneath */}
-              <span className="text-[9px] font-medium text-neutral-400">
-                {format(day, 'd')}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Legend */}
-      <div className="mt-8 flex items-center justify-end gap-2 text-[10px] text-neutral-500 font-medium">
-        <span>Less</span>
-        <div className="w-3 h-3 rounded-sm bg-neutral-100" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-200" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-400" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-600" />
-        <span>More</span>
-      </div>
-    </div>
-  );
-};
-
-// Tabs Components
-const Tabs = ({ value, onValueChange, children }) => (
-  <div className="inline-flex p-1 bg-neutral-100 rounded-lg">{children(value, onValueChange)}</div>
-);
-
-const TabsTrigger = ({ value, activeValue, onClick, children }) => (
-  <button
-    onClick={() => onClick(value)}
-    className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${
-      activeValue === value ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
-    }`}
-  >
-    {children}
-  </button>
-);
-
-/**
- * MOCK DATA GENERATOR
- */
-const generateMockData = () => {
-  const logs = [];
-  const tasks = [];
-  for (let i = 0; i < 90; i++) {
-    const date = subDays(new Date(), i);
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const tasksDone = Math.floor(Math.random() * 8);
-    
-    logs.push({
-      date: dateStr,
-      tasks_completed: tasksDone,
-      xp_earned: tasksDone * 50 + Math.floor(Math.random() * 100),
-      focus_minutes: tasksDone * 25 + Math.floor(Math.random() * 30),
-    });
-
-    for (let j = 0; j < 5; j++) {
-      tasks.push({
-        id: `${i}-${j}`,
-        created_date: dateStr,
-        status: Math.random() > 0.3 ? 'completed' : 'pending',
-      });
-    }
-  }
-  return { logs, tasks };
-};
-
-const { logs: MOCK_LOGS, tasks: MOCK_TASKS } = generateMockData();
-
-/**
- * MAIN ANALYTICS COMPONENT
- */
-export default function App() {
-  const [period, setPeriod] = useState('week');
-  const today = new Date();
-
-  const dailyLogs = MOCK_LOGS;
-  const tasks = MOCK_TASKS;
-
-  const periodDates = useMemo(() => {
-    if (period === 'week') {
-      return eachDayOfInterval({
-        start: startOfWeek(today, { weekStartsOn: 1 }),
-        end: endOfWeek(today, { weekStartsOn: 1 }),
-      });
-    } else if (period === 'month') {
-      return eachDayOfInterval({
-        start: startOfMonth(today),
-        end: endOfMonth(today),
-      });
-    }
-    return eachDayOfInterval({
-      start: subDays(today, 6),
-      end: today,
-    });
-  }, [period]);
-
-  const chartData = useMemo(() => {
-    return periodDates.map(date => {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      const log = dailyLogs.find(l => l.date === dateStr);
-      return {
-        date: format(date, period === 'month' ? 'd' : 'EEE'),
-        fullDate: dateStr,
-        tasks: log?.tasks_completed || 0,
-        xp: log?.xp_earned || 0,
-        focus: log?.focus_minutes || 0,
-      };
-    });
-  }, [periodDates, dailyLogs, period]);
-
-  const periodStats = useMemo(() => {
-    return chartData.reduce((acc, day) => ({
-      tasks: acc.tasks + day.tasks,
-      xp: acc.xp + day.xp,
-      focus: acc.focus + day.focus,
-    }), { tasks: 0, xp: 0, focus: 0 });
-  }, [chartData]);
-
-  const avgTasksPerDay = periodStats.tasks / periodDates.length;
-  const avgXPPerDay = periodStats.xp / periodDates.length;
-
-  const periodTasks = useMemo(() => {
-    return tasks.filter(t => {
-      const taskDate = parseISO(t.created_date);
-      return taskDate >= periodDates[0] && taskDate <= periodDates[periodDates.length - 1];
-    });
-  }, [tasks, periodDates]);
-
-  const completedPeriodTasks = periodTasks.filter(t => t.status === 'completed');
-  const completionRate = periodTasks.length > 0 
-    ? Math.round((completedPeriodTasks.length / periodTasks.length) * 100) 
-    : 0;
-
-  return (
-    <div className="min-h-screen bg-neutral-50 font-sans text-neutral-900">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-neutral-900">Analytics</h1>
-            <p className="text-sm text-neutral-500 mt-1">Review your productivity trends and milestones.</p>
-          </div>
-          <div className="hidden md:flex p-2 bg-white border border-neutral-100 rounded-full shadow-sm">
-             <Layout className="w-5 h-5 text-neutral-400" />
-          </div>
-        </div>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
 
-        {/* Period Selector */}
-        <div className="mb-8">
-          <Tabs value={period} onValueChange={setPeriod}>
-            {(val, onChange) => (
-              <>
-                <TabsTrigger value="week" activeValue={val} onClick={onChange}>This Week</TabsTrigger>
-                <TabsTrigger value="month" activeValue={val} onClick={onChange}>This Month</TabsTrigger>
-              </>
-            )}
-          </Tabs>
-        </div>
+        .heat-cell {
+            transition: all 0.2s ease;
+        }
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <StatCard
-            label="Tasks Done"
-            value={periodStats.tasks}
-            sublabel={`${avgTasksPerDay.toFixed(1)} tasks/day`}
-            icon={CheckCircle2}
-          />
-          <StatCard
-            label="XP Earned"
-            value={periodStats.xp.toLocaleString()}
-            sublabel={`${Math.round(avgXPPerDay)} XP/day`}
-            icon={Zap}
-          />
-          <StatCard
-            label="Focus Time"
-            value={`${Math.round(periodStats.focus / 60)}h ${periodStats.focus % 60}m`}
-            sublabel="Deep work sessions"
-            icon={Clock}
-          />
-          <StatCard
-            label="Completion"
-            value={`${completionRate}%`}
-            sublabel={`${completedPeriodTasks.length} of ${periodTasks.length} tasks`}
-            icon={Target}
-          />
-        </div>
+        .heat-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
 
-        <div className="grid grid-cols-1 gap-6">
-          
-          {/* Tasks Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-semibold text-neutral-900">Tasks Completed</h3>
-              <div className="flex items-center gap-1.5 text-emerald-600 text-[10px] font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
-                <TrendingUp className="w-3 h-3" />
-                +12%
-              </div>
+        .tooltip-custom {
+            visibility: hidden;
+            background-color: #171717;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 4px 8px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .group:hover .tooltip-custom {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .nav-item-active {
+            background-color: #171717 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="text-neutral-900 pb-20 lg:pb-0">
+
+    <!-- Desktop Navigation -->
+    <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
+                    <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <span class="font-bold text-neutral-900 tracking-tight">FocusFlow</span>
             </div>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                  <XAxis 
-                    dataKey="date" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fill: '#737373', fontWeight: 500 }}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fill: '#737373' }}
-                    width={40}
-                  />
-                  <Tooltip
-                    cursor={{ fill: '#fafafa' }}
-                    contentStyle={{
-                      background: '#fff',
-                      border: '1px solid #f5f5f5',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Bar 
-                    dataKey="tasks" 
-                    fill="#171717" 
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={32}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
 
-          {/* XP Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm"
-          >
-            <h3 className="text-sm font-semibold text-neutral-900 mb-6">XP Growth</h3>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="xpGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#171717" stopOpacity={0.08}/>
-                      <stop offset="95%" stopColor="#171717" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis 
-                    dataKey="date" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fill: '#737373', fontWeight: 500 }}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fill: '#737373' }}
-                    width={40}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: '#fff',
-                      border: '1px solid #f5f5f5',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Area 
-                    type="monotone"
-                    dataKey="xp" 
-                    stroke="#171717" 
-                    strokeWidth={2.5}
-                    fill="url(#xpGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div class="flex items-center gap-1">
+                <button onclick="setActiveTab('home')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="home", href="index.html">home</button>
+                <button onclick="setActiveTab('tasks')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="tasks">tasks</button>
+                <button onclick="setActiveTab('analytics')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all nav-item-active" data-tab="analytics">analytics</button>
+                <button onclick="setActiveTab('rewards')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="rewards">rewards</button>
+                <button onclick="setActiveTab('progress')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="progress">progress</button>
+                <button onclick="setActiveTab('settings')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="settings">settings</button>
             </div>
-          </motion.div>
 
-          {/* Activity Calendar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <StreakCalendar dailyLogs={dailyLogs} />
-          </motion.div>
-          
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
+                    <svg class="w-3.5 h-3.5 text-amber-500 fill-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <span id="nav-xp-counter" class="text-xs font-black text-amber-700">450</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
+                    <svg class="w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                </div>
+            </div>
         </div>
-      </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
+        <div class="flex items-center justify-around max-w-md mx-auto">
+            <button onclick="setActiveTab('home')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="home">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">home</span>
+            </button>
+            <button onclick="setActiveTab('tasks')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="tasks">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">tasks</span>
+            </button>
+            <button onclick="setActiveTab('analytics')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-900" data-tab="analytics">
+                <svg class="w-6 h-6 scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">analytics</span>
+            </button>
+            <button onclick="setActiveTab('rewards')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="rewards">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="14" x="3" y="8" rx="2"/><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 5.996-2.258 4 4 0 0 0 5.996 2.258 4 4 0 0 0-2.526-5.77A3 3 0 1 0 12 5"/><path d="M12 8v14M3 12h18"/></svg>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">rewards</span>
+            </button>
+            <button onclick="setActiveTab('progress')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="progress">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">progress</span>
+            </button>
+        </div>
     </div>
-  );
-}
+
+    <div id="main-content" class="max-w-4xl mx-auto px-6 py-12">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-10">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-neutral-900">Analytics</h1>
+                <p class="text-sm text-neutral-500 mt-1">Review your productivity trends and milestones.</p>
+            </div>
+            <div class="hidden md:flex p-2 bg-white border border-neutral-100 rounded-full shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            </div>
+        </div>
+
+        <!-- Period Selector -->
+        <div class="mb-8">
+            <div class="inline-flex p-1 bg-neutral-100 rounded-lg">
+                <button onclick="updatePeriod('week')" id="btn-week" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all bg-white text-neutral-900 shadow-sm">This Week</button>
+                <button onclick="updatePeriod('month')" id="btn-month" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all text-neutral-500 hover:text-neutral-700">This Month</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10" id="stats-grid">
+            <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="p-2 bg-neutral-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                </div>
+                <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks Done</p>
+                <h4 id="stat-tasks" class="text-xl font-bold text-neutral-900 mt-0.5">0</h4>
+                <p id="sub-tasks" class="text-[10px] text-neutral-400 mt-1 font-medium">0/day avg</p>
+            </div>
+            
+            <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="p-2 bg-neutral-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><path d="m6 2 3 9 6-9 3 9-9 11-9-11z"/></svg>
+                    </div>
+                </div>
+                <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">XP Earned</p>
+                <h4 id="stat-xp" class="text-xl font-bold text-neutral-900 mt-0.5">0</h4>
+                <p id="sub-xp" class="text-[10px] text-neutral-400 mt-1 font-medium">0/day avg</p>
+            </div>
+
+            <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="p-2 bg-neutral-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                </div>
+                <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Focus Time</p>
+                <h4 id="stat-focus" class="text-xl font-bold text-neutral-900 mt-0.5">0h 0m</h4>
+                <p class="text-[10px] text-neutral-400 mt-1 font-medium">Deep work sessions</p>
+            </div>
+
+            <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="p-2 bg-neutral-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </div>
+                </div>
+                <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Completion</p>
+                <h4 id="stat-rate" class="text-xl font-bold text-neutral-900 mt-0.5">0%</h4>
+                <p id="sub-rate" class="text-[10px] text-neutral-400 mt-1 font-medium">0 of 0 tasks</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+            <div class="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-semibold text-neutral-900">Tasks Completed</h3>
+                    <div class="flex items-center gap-1.5 text-emerald-600 text-[10px] font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        +12%
+                    </div>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="tasksChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-sm font-semibold text-neutral-900 mb-6">XP Growth</h3>
+                <div class="h-64 w-full">
+                    <canvas id="xpChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white border border-neutral-100 rounded-xl p-6 shadow-sm relative">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-sm font-semibold text-neutral-900">Consistency Calendar</h3>
+                        <p class="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">Monthly Activity Heatmap</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <button onclick="changeMonth(-1)" class="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <span id="calendar-month" class="text-xs font-bold min-w-[90px] text-center text-neutral-700">December 2025</span>
+                        <button onclick="changeMonth(1)" class="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-x-2 gap-y-4 max-w-2xl mx-auto"></div>
+                <div class="mt-8 flex items-center justify-end gap-2 text-[10px] text-neutral-500 font-medium">
+                    <span>Less</span>
+                    <div class="w-3 h-3 rounded-sm bg-neutral-100"></div>
+                    <div class="w-3 h-3 rounded-sm bg-emerald-200"></div>
+                    <div class="w-3 h-3 rounded-sm bg-emerald-400"></div>
+                    <div class="w-3 h-3 rounded-sm bg-emerald-600"></div>
+                    <span>More</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let currentTab = 'analytics';
+        let xpScore = 450;
+        const MOCK_LOGS = [];
+        const MOCK_TASKS = [];
+        const today = new Date();
+
+        function generateData() {
+            for (let i = 0; i < 90; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const tasksDone = Math.floor(Math.random() * 8);
+                
+                MOCK_LOGS.push({
+                    date: dateStr,
+                    tasks_completed: tasksDone,
+                    xp_earned: tasksDone * 50 + Math.floor(Math.random() * 100),
+                    focus_minutes: tasksDone * 25 + Math.floor(Math.random() * 30),
+                });
+
+                for (let j = 0; j < 5; j++) {
+                    MOCK_TASKS.push({
+                        created_date: dateStr,
+                        status: Math.random() > 0.3 ? 'completed' : 'pending',
+                    });
+                }
+            }
+        }
+
+        generateData();
+
+        let currentPeriod = 'week';
+        let calendarDate = new Date();
+        let tasksChart, xpChart;
+
+        function setActiveTab(tabId) {
+            currentTab = tabId;
+            
+            // Update Desktop Nav UI
+            document.querySelectorAll('.nav-btn-desktop').forEach(btn => {
+                if (btn.dataset.tab === tabId) btn.classList.add('nav-item-active');
+                else btn.classList.remove('nav-item-active');
+            });
+
+            // Update Mobile Nav UI
+            document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
+                const icon = btn.querySelector('svg');
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('text-neutral-900');
+                    btn.classList.remove('text-neutral-400');
+                    icon.classList.add('scale-110');
+                } else {
+                    btn.classList.remove('text-neutral-900');
+                    btn.classList.add('text-neutral-400');
+                    icon.classList.remove('scale-110');
+                }
+            });
+
+            // Handle content visibility
+            const mainContent = document.getElementById('main-content');
+            if (tabId === 'analytics') {
+                mainContent.style.opacity = '1';
+                mainContent.style.pointerEvents = 'auto';
+            } else {
+                // Placeholder for other tabs
+                mainContent.style.opacity = '0.3';
+                mainContent.style.pointerEvents = 'none';
+            }
+        }
+
+        function updatePeriod(period) {
+            currentPeriod = period;
+            document.getElementById('btn-week').className = period === 'week' ? 'px-4 py-1.5 text-xs font-medium rounded-md transition-all bg-white text-neutral-900 shadow-sm' : 'px-4 py-1.5 text-xs font-medium rounded-md transition-all text-neutral-500 hover:text-neutral-700';
+            document.getElementById('btn-month').className = period === 'month' ? 'px-4 py-1.5 text-xs font-medium rounded-md transition-all bg-white text-neutral-900 shadow-sm' : 'px-4 py-1.5 text-xs font-medium rounded-md transition-all text-neutral-500 hover:text-neutral-700';
+            renderDashboard();
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function getDatesForPeriod() {
+            const dates = [];
+            let count = currentPeriod === 'week' ? 7 : 30;
+            for (let i = count - 1; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                dates.push(d);
+            }
+            return dates;
+        }
+
+        function renderDashboard() {
+            const dates = getDatesForPeriod();
+            const labels = dates.map(d => currentPeriod === 'week' ? d.toLocaleDateString('en-US', {weekday: 'short'}) : d.getDate());
+            const dateStrings = dates.map(d => d.toISOString().split('T')[0]);
+
+            const chartData = dateStrings.map(ds => {
+                const log = MOCK_LOGS.find(l => l.date === ds);
+                return {
+                    tasks: log?.tasks_completed || 0,
+                    xp: log?.xp_earned || 0,
+                    focus: log?.focus_minutes || 0
+                };
+            });
+
+            const stats = chartData.reduce((acc, curr) => ({
+                tasks: acc.tasks + curr.tasks,
+                xp: acc.xp + curr.xp,
+                focus: acc.focus + curr.focus
+            }), {tasks: 0, xp: 0, focus: 0});
+
+            const totalTasksInPeriod = MOCK_TASKS.filter(t => dateStrings.includes(t.created_date));
+            const completedInPeriod = totalTasksInPeriod.filter(t => t.status === 'completed');
+            const rate = totalTasksInPeriod.length > 0 ? Math.round((completedInPeriod.length / totalTasksInPeriod.length) * 100) : 0;
+
+            document.getElementById('stat-tasks').innerText = stats.tasks;
+            document.getElementById('sub-tasks').innerText = (stats.tasks / dates.length).toFixed(1) + '/day avg';
+            document.getElementById('stat-xp').innerText = stats.xp.toLocaleString();
+            document.getElementById('sub-xp').innerText = Math.round(stats.xp / dates.length) + '/day avg';
+            document.getElementById('stat-focus').innerText = Math.floor(stats.focus / 60) + 'h ' + (stats.focus % 60) + 'm';
+            document.getElementById('stat-rate').innerText = rate + '%';
+            document.getElementById('sub-rate').innerText = completedInPeriod.length + ' of ' + totalTasksInPeriod.length + ' tasks';
+
+            if (tasksChart) tasksChart.destroy();
+            if (xpChart) xpChart.destroy();
+
+            const ctxTasks = document.getElementById('tasksChart').getContext('2d');
+            tasksChart = new Chart(ctxTasks, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: chartData.map(d => d.tasks),
+                        backgroundColor: '#171717',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } },
+                        x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+
+            const ctxXP = document.getElementById('xpChart').getContext('2d');
+            xpChart = new Chart(ctxXP, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: chartData.map(d => d.xp),
+                        borderColor: '#171717',
+                        backgroundColor: 'rgba(23, 23, 23, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } },
+                        x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthLabel = document.getElementById('calendar-month');
+            grid.innerHTML = '';
+            monthLabel.innerText = calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+            const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+            const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = "text-[9px] font-bold text-neutral-400 text-center uppercase tracking-tighter mb-1";
+                dayHeader.innerText = d;
+                grid.appendChild(dayHeader);
+            });
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
+                const ds = date.toISOString().split('T')[0];
+                const log = MOCK_LOGS.find(l => l.date === ds);
+                const tasks = log?.tasks_completed || 0;
+
+                let colorClass = 'bg-neutral-100';
+                if (tasks > 5) colorClass = 'bg-emerald-600';
+                else if (tasks > 2) colorClass = 'bg-emerald-400';
+                else if (tasks > 0) colorClass = 'bg-emerald-200';
+
+                const cellWrapper = document.createElement('div');
+                cellWrapper.className = "flex flex-col items-center gap-1 group relative";
+                cellWrapper.innerHTML = `
+                    <div class="tooltip-custom">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}: ${tasks} tasks</div>
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-md ${colorClass} heat-cell cursor-pointer"></div>
+                    <span class="text-[9px] font-medium text-neutral-400">${day}</span>
+                `;
+                grid.appendChild(cellWrapper);
+            }
+        }
+
+        window.onload = () => {
+            renderDashboard();
+            renderCalendar();
+            document.getElementById('nav-xp-counter').innerText = xpScore;
+        };
+    </script>
+</body>
+</html>
