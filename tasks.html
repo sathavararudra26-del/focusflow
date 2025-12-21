@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
@@ -9,12 +9,23 @@ import {
   ListFilter,
   Clock,
   LayoutGrid,
-  List as ListIcon
+  List as ListIcon,
+  ChevronDown,
+  Zap,
+  Star,
+  Trophy,
+  ChevronRight,
+  X,
+  Bell,
+  Settings,
+  Gift,
+  TrendingUp,
+  BarChart2
 } from 'lucide-react';
 import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 
-// --- Icon Component (From your Nav Bar) ---
-const CustomIcon = ({ name, className = "w-5 h-5", ...props }) => {
+// --- Icon Component (Custom SVG logic from navigation request) ---
+const Icon = ({ name, className = "w-5 h-5", ...props }) => {
   const paths = {
     Plus: <path d="M12 5v14M5 12h14" />,
     Zap: <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />,
@@ -56,7 +67,7 @@ const DesktopNav = ({ activeTab, setActiveTab, menuItems, xp }) => {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
-            <CustomIcon name="Zap" className="w-4 h-4 fill-white" />
+            <Icon name="Zap" className="w-4 h-4 fill-white" />
           </div>
           <span className="font-bold text-neutral-900 tracking-tight">FocusFlow</span>
         </div>
@@ -79,11 +90,11 @@ const DesktopNav = ({ activeTab, setActiveTab, menuItems, xp }) => {
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
-            <CustomIcon name="Zap" className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <Icon name="Zap" className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span className="text-xs font-black text-amber-700">{xp}</span>
           </div>
           <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
-            <CustomIcon name="Bell" className="w-4 h-4 text-neutral-400" />
+            <Icon name="Bell" className="w-4 h-4 text-neutral-400" />
           </div>
         </div>
       </div>
@@ -104,7 +115,7 @@ const MobileNav = ({ activeTab, setActiveTab, menuItems }) => {
               activeTab === item.id ? 'text-neutral-900' : 'text-neutral-400'
             }`}
           >
-            <CustomIcon
+            <Icon
               name={item.icon}
               className={`w-6 h-6 transition-transform ${activeTab === item.id ? 'scale-110' : ''}`}
             />
@@ -118,59 +129,161 @@ const MobileNav = ({ activeTab, setActiveTab, menuItems }) => {
   );
 };
 
-// --- Style Constants ---
-const PRIORITY_COLORS = {
-  High: 'text-neutral-900 bg-neutral-100 border-neutral-200',
-  Medium: 'text-neutral-600 bg-neutral-50 border-neutral-100',
-  Low: 'text-neutral-400 bg-neutral-50 border-neutral-100'
+// --- Animated Level Up Component ---
+const LevelUpNotification = ({ level }) => {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none px-4 bg-neutral-900/20 backdrop-blur-sm">
+      <div className="relative animate-in zoom-in fade-in duration-500">
+        <div className="absolute inset-0 bg-amber-400 blur-3xl opacity-30 rounded-full animate-pulse" />
+        <div className="bg-neutral-900 border-4 border-amber-400 text-white p-8 rounded-[40px] shadow-2xl flex flex-col items-center gap-4 min-w-[300px] pointer-events-auto">
+          <div className="w-20 h-20 bg-amber-400 rounded-3xl flex items-center justify-center -mt-20 rotate-12 shadow-lg">
+            <Trophy className="w-10 h-10 text-neutral-900" />
+          </div>
+          <div className="text-center mt-2">
+            <h3 className="font-extrabold text-3xl tracking-tighter mb-1 animate-bounce">LEVEL UP!</h3>
+            <p className="text-neutral-400 font-bold uppercase tracking-widest text-[10px]">New Rank Achieved</p>
+          </div>
+          <div className="flex items-center gap-4 py-4">
+            <span className="text-neutral-500 text-2xl font-bold opacity-50">{level - 1}</span>
+            <ChevronRight className="w-6 h-6 text-amber-400" />
+            <span className="text-6xl font-extrabold text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">{level}</span>
+          </div>
+          <p className="text-amber-200 text-sm font-medium">Keep up the focus flow!</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const CATEGORY_COLORS = {
-  Work: 'bg-neutral-900 text-white',
-  Personal: 'bg-neutral-200 text-neutral-800',
-  Shopping: 'bg-neutral-100 text-neutral-600',
-  Health: 'bg-neutral-100 text-neutral-700 border border-neutral-200'
-};
-
-const App = () => {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState('tasks');
-  const [xp] = useState(450);
-  const menuItems = [
-    { id: 'home', icon: 'Calendar' },
-    { id: 'tasks', icon: 'CheckCircle2' },
-    { id: 'analytics', icon: 'BarChart2' },
-    { id: 'rewards', icon: 'Gift' },
-    { id: 'progress', icon: 'TrendingUp' },
-    { id: 'settings', icon: 'Settings' }
-  ];
-
-  // Tasks State
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Design System Update', description: 'Review and update the color palette for the new project.', priority: 'High', category: 'Work', completed: false, dueDate: '2025-12-24' },
-    { id: 2, title: 'Grocery Shopping', description: 'Milk, eggs, bread, and fruits.', priority: 'Low', category: 'Shopping', completed: true, dueDate: '2025-12-21' },
-    { id: 3, title: 'Weekly Gym Session', description: 'Cardio and strength training.', priority: 'Medium', category: 'Health', completed: false, dueDate: '2025-12-22' },
-    { id: 4, title: 'Client Meeting', description: 'Discuss project milestones and deadlines.', priority: 'High', category: 'Work', completed: false, dueDate: '2025-12-23' },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState('list');
-
-  const [newTask, setNewTask] = useState({
+// --- Task Creation Modal ---
+const TaskModal = ({ isOpen, onClose, onAddTask }) => {
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'Medium',
+    duration: 30,
+    difficulty: 'Medium',
     category: 'Work',
     dueDate: format(new Date(), 'yyyy-MM-dd')
   });
 
-  // Task Handlers
+  const multipliers = { 'Easy': 1, 'Medium': 2, 'Hard': 4, 'Elite': 8 };
+  const calculatedXP = Math.round(formData.duration * multipliers[formData.difficulty]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.title.trim()) return;
+    onAddTask({ ...formData, xp: calculatedXP });
+    setFormData({ title: '', description: '', duration: 30, difficulty: 'Medium', category: 'Work', dueDate: format(new Date(), 'yyyy-MM-dd') });
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-md">
+      <div className="bg-white w-full max-w-md rounded-[40px] overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="px-8 pt-8 pb-4 flex justify-between items-center">
+          <h2 className="text-2xl font-extrabold tracking-tight text-neutral-900">New Task</h2>
+          <button onClick={onClose} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
+            <X size={20} className="text-neutral-400" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-6">
+          <div>
+            <label className="block text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Task Title</label>
+            <input
+              autoFocus
+              className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[20px] focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all text-base font-semibold"
+              placeholder="What's the focus?"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Duration (Min)</label>
+              <input
+                type="number"
+                className="w-full px-6 py-3.5 bg-neutral-50 border border-neutral-100 rounded-[20px] focus:outline-none text-sm font-bold"
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Date</label>
+              <input
+                type="date"
+                className="w-full px-6 py-3.5 bg-neutral-50 border border-neutral-100 rounded-[20px] focus:outline-none text-sm font-bold"
+                value={formData.dueDate}
+                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Difficulty</label>
+            <div className="grid grid-cols-4 gap-2">
+              {['Easy', 'Medium', 'Hard', 'Elite'].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, difficulty: d })}
+                  className={`py-3 text-[10px] font-extrabold rounded-[15px] border transition-all ${
+                    formData.difficulty === d
+                      ? 'bg-neutral-900 border-neutral-900 text-white shadow-lg'
+                      : 'bg-white border-neutral-100 text-neutral-400 hover:border-neutral-200'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-amber-50 p-6 rounded-[24px] border border-amber-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center shadow-sm">
+                <Icon name="Zap" className="w-5 h-5 text-neutral-900 fill-neutral-900" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest">Reward</span>
+                <span className="text-sm font-bold text-amber-900">Total XP Gain</span>
+              </div>
+            </div>
+            <span className="text-2xl font-extrabold text-amber-600">+{calculatedXP}</span>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-5 bg-neutral-900 text-white font-extrabold rounded-[22px] hover:bg-neutral-800 transition-all shadow-xl shadow-neutral-200 mt-2 active:scale-[0.98]"
+          >
+            Create Task
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('tasks');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [stats, setStats] = useState({ xp: 450, level: 1 });
+  const [showLevelUp, setShowLevelUp] = useState(false);
+
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Design System Update', priority: 'High', category: 'Work', completed: false, dueDate: '2025-12-24', duration: 45, xp: 180 },
+    { id: 2, title: 'Weekly Gym Session', priority: 'Medium', category: 'Health', completed: false, dueDate: '2025-12-22', duration: 60, xp: 120 },
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all');
+
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = filter === 'all' || 
                            (filter === 'pending' && !task.completed) || 
                            (filter === 'completed' && task.completed);
@@ -188,179 +301,181 @@ const App = () => {
     return Object.keys(groups).sort().reduce((acc, key) => { acc[key] = groups[key]; return acc; }, {});
   }, [filteredTasks]);
 
-  const formatDateLabel = (dateStr) => {
-    if (dateStr === 'Unscheduled') return 'Unscheduled';
-    const date = parseISO(dateStr);
-    if (isToday(date)) return 'Today';
-    if (isTomorrow(date)) return 'Tomorrow';
-    return format(date, 'EEEE, MMM d');
+  const toggleTask = (id) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const becomingCompleted = !task.completed;
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: becomingCompleted } : t));
+
+    if (becomingCompleted) {
+      setStats(prev => {
+        const newXp = prev.xp + (task.xp || 0);
+        const oldLevel = Math.floor(prev.xp / 500) + 1;
+        const newLevel = Math.floor(newXp / 500) + 1;
+        if (newLevel > oldLevel) {
+          setShowLevelUp(true);
+          setTimeout(() => setShowLevelUp(false), 5000);
+        }
+        return { ...prev, xp: newXp, level: newLevel };
+      });
+    }
   };
 
-  const toggleTask = (id) => setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  const deleteTask = (id) => setTasks(tasks.filter(t => t.id !== id));
-
-  const addTask = (e) => {
-    e.preventDefault();
-    if (!newTask.title.trim()) return;
-    setTasks([{ ...newTask, id: Date.now(), completed: false }, ...tasks]);
-    setNewTask({ title: '', description: '', priority: 'Medium', category: 'Work', dueDate: format(new Date(), 'yyyy-MM-dd') });
-    setIsModalOpen(false);
+  const handleAddTask = (taskData) => {
+    const newTask = { ...taskData, id: Date.now(), completed: false, priority: 'Medium' };
+    setTasks([newTask, ...tasks]);
   };
+
+  const menuItems = [
+    { id: 'home', icon: 'Calendar' },
+    { id: 'tasks', icon: 'CheckCircle2' },
+    { id: 'analytics', icon: 'BarChart2' },
+    { id: 'rewards', icon: 'Gift' },
+    { id: 'progress', icon: 'TrendingUp' },
+    { id: 'settings', icon: 'Settings' }
+  ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans pb-24 lg:pb-0">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 selection-none relative" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');`}
+      </style>
+
+      {showLevelUp && <LevelUpNotification level={stats.level} />}
+      
+      <TaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddTask={handleAddTask} />
+
+      {/* Navigation from User Requirement */}
       <DesktopNav 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         menuItems={menuItems} 
-        xp={xp} 
+        xp={stats.xp} 
       />
 
-      {activeTab === 'tasks' ? (
-        <>
-          <header className="max-w-4xl mx-auto px-6 pt-12 pb-8">
-            <div className="flex items-center justify-between mb-8">
+      <main className="pb-32 lg:pb-12">
+        {activeTab === 'tasks' ? (
+          <div className="max-w-4xl mx-auto px-6 pt-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
               <div>
-                <h1 className="text-3xl font-semibold tracking-tight">Tasks</h1>
-                <p className="text-sm text-neutral-500 mt-1">
-                  {tasks.filter(t => !t.completed).length} pending tasks
-                </p>
+                <h1 className="text-5xl font-extrabold tracking-tighter text-neutral-900">Task Center</h1>
+                <p className="text-neutral-500 mt-2 font-semibold">Transform effort into progress.</p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium shadow-sm"
+                className="flex items-center gap-2 bg-neutral-900 text-white px-8 py-4 rounded-[22px] font-extrabold text-sm shadow-2xl shadow-neutral-200 hover:translate-y-[-2px] transition-all active:translate-y-0"
               >
-                <Plus size={18} />
-                New Task
+                <Icon name="Plus" size={20} strokeWidth={3} />
+                Add Task
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-2 rounded-xl border border-neutral-100 shadow-sm">
-              <div className="flex bg-neutral-100 p-1 rounded-lg w-full sm:w-auto">
-                {['all', 'pending', 'completed'].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                      filter === f ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-500 hover:text-neutral-700'
-                    }`}
-                  >
-                    {f.charAt(0).toUpperCase() + f.slice(1)}
-                  </button>
-                ))}
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="flex-grow relative">
+                <Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 w-4 h-4" />
+                <input 
+                  type="text" placeholder="Search your workflow..."
+                  className="w-full pl-12 pr-6 py-4 bg-white border border-neutral-100 rounded-[20px] text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-100 transition-all"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="relative flex-grow sm:flex-grow-0">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
-                  <input 
-                    type="text" placeholder="Search..."
-                    className="w-full sm:w-48 pl-9 pr-4 py-1.5 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-neutral-400"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="flex bg-neutral-100 p-1 rounded-lg shrink-0">
-                  <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-neutral-400'}`}><LayoutGrid size={16}/></button>
-                  <button onClick={() => setViewMode('list')} className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-white shadow-sm' : 'text-neutral-400'}`}><ListIcon size={16}/></button>
-                </div>
+              <div className="flex bg-neutral-100 p-1.5 rounded-[20px] shrink-0">
+                  {['all', 'pending', 'completed'].map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFilter(f)}
+                      className={`px-5 py-2.5 rounded-[15px] text-[10px] font-extrabold uppercase tracking-widest transition-all ${
+                        filter === f ? 'bg-white shadow-sm text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
               </div>
             </div>
-          </header>
 
-          <main className="max-w-4xl mx-auto px-6 pb-20">
-            <div className="space-y-10">
+            {/* Task List */}
+            <div className="space-y-14">
               {Object.entries(groupedTasks).map(([date, items]) => (
                 <section key={date}>
-                  <h3 className="text-[11px] font-bold text-neutral-400 uppercase tracking-[0.1em] mb-4 flex items-center gap-2">
-                    <Calendar size={14} />
-                    {formatDateLabel(date)}
-                  </h3>
-                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'space-y-2'}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
+                      <Icon name="Calendar" className="w-3.5 h-3.5 text-neutral-500" />
+                    </div>
+                    <h3 className="text-[11px] font-extrabold text-neutral-400 uppercase tracking-[0.2em]">
+                      {date === 'Unscheduled' ? 'Backlog' : (isToday(parseISO(date)) ? 'Today' : format(parseISO(date), 'MMMM dd'))}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
                     {items.map((task) => (
-                      <div key={task.id} className={`group relative flex items-start gap-4 p-4 rounded-xl border transition-all duration-200 ${task.completed ? 'bg-neutral-50/50 border-neutral-100 opacity-60' : 'bg-white border-neutral-200 hover:border-neutral-300 hover:shadow-sm'}`}>
-                        <button onClick={() => toggleTask(task.id)} className={`mt-0.5 shrink-0 transition-colors ${task.completed ? 'text-neutral-900' : 'text-neutral-300 hover:text-neutral-500'}`}>
-                          {task.completed ? <CheckCircle2 size={22} /> : <Circle size={22} />}
+                      <div key={task.id} className={`group flex items-center gap-6 p-6 rounded-[32px] border transition-all duration-300 ${task.completed ? 'bg-neutral-50 border-neutral-100' : 'bg-white border-neutral-100 hover:border-neutral-200 hover:shadow-xl hover:shadow-neutral-200/30'}`}>
+                        <button onClick={() => toggleTask(task.id)} className={`shrink-0 transition-transform active:scale-90 ${task.completed ? 'text-neutral-900' : 'text-neutral-200 hover:text-neutral-400'}`}>
+                          {task.completed ? <Icon name="CheckCircle2" className="w-7 h-7" /> : <div className="w-7 h-7 rounded-full border-2 border-current" />}
                         </button>
-                        <div className="flex-grow min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <h4 className={`font-medium text-neutral-900 ${task.completed ? 'line-through text-neutral-400' : ''}`}>{task.title}</h4>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight ${CATEGORY_COLORS[task.category]}`}>{task.category}</span>
-                          </div>
-                          {!task.completed && task.description && <p className="text-sm text-neutral-500 mt-1 line-clamp-1">{task.description}</p>}
-                          <div className="mt-3 flex items-center gap-3">
-                            <span className={`text-[10px] px-2 py-0.5 rounded border font-medium ${PRIORITY_COLORS[task.priority]}`}>{task.priority}</span>
-                            {task.dueDate && !isToday(parseISO(task.dueDate)) && (
-                              <span className="text-[10px] text-neutral-400 flex items-center gap-1"><Clock size={10} />{format(parseISO(task.dueDate), 'MMM d')}</span>
+                        
+                        <div className="flex-grow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className={`font-bold text-lg leading-tight transition-all ${task.completed ? 'text-neutral-400 line-through' : 'text-neutral-900'}`}>
+                              {task.title}
+                            </h4>
+                            {!task.completed && (
+                              <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
+                                <Icon name="Zap" className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                                <span className="text-[10px] font-black text-amber-600">+{task.xp}</span>
+                              </div>
                             )}
                           </div>
+                          
+                          <div className="flex items-center gap-4">
+                            <span className="text-[10px] font-bold text-neutral-400 flex items-center gap-1.5">
+                              <Icon name="Clock" className="w-3 h-3" /> {task.duration} mins
+                            </span>
+                            <div className={`w-1 h-1 rounded-full bg-neutral-200`} />
+                            <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest">
+                              {task.category}
+                            </span>
+                          </div>
                         </div>
-                        <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 p-1.5 text-neutral-300 hover:text-red-500 rounded-md hover:bg-red-50"><Trash2 size={16} /></button>
+
+                        <button onClick={() => setTasks(tasks.filter(t => t.id !== task.id))} className="opacity-0 group-hover:opacity-100 p-3 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                          <Icon name="X" className="w-4 h-4" />
+                        </button>
                       </div>
                     ))}
                   </div>
                 </section>
               ))}
+
               {filteredTasks.length === 0 && (
-                <div className="py-20 text-center"><ListFilter className="mx-auto text-neutral-200 mb-4" size={48} /><p className="text-neutral-400 text-sm">No tasks found</p></div>
+                <div className="py-24 text-center bg-white rounded-[48px] border-2 border-dashed border-neutral-100">
+                  <div className="w-20 h-20 bg-neutral-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Icon name="Calendar" className="w-8 h-8 text-neutral-200" />
+                  </div>
+                  <h3 className="text-xl font-extrabold text-neutral-900">Clear Skies</h3>
+                  <p className="text-neutral-400 mt-2 font-semibold">No tasks match your current view.</p>
+                </div>
               )}
             </div>
-          </main>
-        </>
-      ) : (
-        <main className="max-w-4xl mx-auto px-6 py-12">
-          <div className="bg-white p-12 rounded-3xl border border-neutral-100 text-center shadow-sm">
-            <h2 className="text-2xl font-bold capitalize">{activeTab} View</h2>
-            <p className="text-neutral-500 mt-2">Content for the {activeTab} section would go here.</p>
           </div>
-        </main>
-      )}
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[70vh] text-center px-6">
+             <div className="w-24 h-24 bg-neutral-100 rounded-[32px] flex items-center justify-center mb-8">
+               <Icon name="Calendar" className="w-10 h-10 text-neutral-300" />
+             </div>
+             <h2 className="text-3xl font-extrabold text-neutral-900 capitalize">{activeTab} View</h2>
+             <p className="text-neutral-400 mt-3 font-semibold max-w-sm">Content for the {activeTab} section would go here.</p>
+          </div>
+        )}
+      </main>
 
       <MobileNav 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         menuItems={menuItems} 
       />
-
-      {/* Add Task Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-neutral-900/10 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-neutral-200 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/50">
-              <h2 className="font-semibold text-neutral-900">New Task</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-neutral-400 hover:text-neutral-600"><Plus size={20} className="rotate-45" /></button>
-            </div>
-            <form onSubmit={addTask} className="p-6 space-y-5">
-              <div className="space-y-4">
-                <input autoFocus required type="text" className="w-full text-xl font-medium placeholder:text-neutral-300 border-none focus:ring-0 p-0" placeholder="Task title..." value={newTask.title} onChange={(e) => setNewTask({...newTask, title: e.target.value})} />
-                <textarea className="w-full text-sm placeholder:text-neutral-300 border-none focus:ring-0 p-0 h-20 resize-none" placeholder="Add details or notes..." value={newTask.description} onChange={(e) => setNewTask({...newTask, description: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-100">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Priority</label>
-                  <select className="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none" value={newTask.priority} onChange={(e) => setNewTask({...newTask, priority: e.target.value})}>
-                    <option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Category</label>
-                  <select className="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none" value={newTask.category} onChange={(e) => setNewTask({...newTask, category: e.target.value})}>
-                    <option value="Work">Work</option><option value="Personal">Personal</option><option value="Shopping">Shopping</option><option value="Health">Health</option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Due Date</label>
-                <input type="date" className="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none" value={newTask.dueDate} onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})} />
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-neutral-600 hover:bg-neutral-50 transition-colors">Discard</button>
-                <button type="submit" className="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">Create Task</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
