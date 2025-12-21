@@ -50,9 +50,14 @@
             background-color: #171717 !important;
             color: white !important;
         }
+
+        /* Selection highlight */
+        ::selection {
+            background-color: #e5e5e5;
+        }
     </style>
 </head>
-<body class="text-neutral-900 pb-20 lg:pb-0">
+<body class="text-neutral-900 pb-24 lg:pb-0 relative min-h-screen bg-neutral-50">
 
     <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
@@ -61,16 +66,17 @@
                 <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
                     <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
-                <span class="font-bold text-neutral-900 tracking-tight">FocusFlow</span>
+                <span class="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
             </div>
 
             <div class="flex items-center gap-1">
-                <button onclick="setActiveTab('home')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="home", href="index.html">home</button>
-                <button onclick="setActiveTab('tasks')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="tasks">tasks</button>
-                <button onclick="setActiveTab('analytics')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all nav-item-active" data-tab="analytics">analytics</button>
-                <button onclick="setActiveTab('rewards')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="rewards">rewards</button>
-                <button onclick="setActiveTab('progress')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="progress">progress</button>
-                <button onclick="setActiveTab('settings')" class="nav-btn-desktop px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100" data-tab="settings">settings</button>
+                <!-- Logic mapping based on your menuItems -->
+                <a href="index.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">home</a>
+                <a href="tasks.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">tasks</a>
+                <a href="analytics.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all nav-item-active">analytics</a>
+                <a href="rewards.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">rewards</a>
+                <a href="progress.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">progress</a>
+                <a href="settings.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">settings</a>
             </div>
 
             <div class="flex items-center gap-4">
@@ -78,7 +84,7 @@
                     <svg class="w-3.5 h-3.5 text-amber-500 fill-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     <span id="nav-xp-counter" class="text-xs font-black text-amber-700">450</span>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center">
                     <svg class="w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                 </div>
             </div>
@@ -87,31 +93,12 @@
 
     <!-- Mobile Navigation -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
-        <div class="flex items-center justify-around max-w-md mx-auto">
-            <button onclick="setActiveTab('home')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="home">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">home</span>
-            </button>
-            <button onclick="setActiveTab('tasks')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="tasks">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">tasks</span>
-            </button>
-            <button onclick="setActiveTab('analytics')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-900" data-tab="analytics">
-                <svg class="w-6 h-6 scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">analytics</span>
-            </button>
-            <button onclick="setActiveTab('rewards')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="rewards">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="14" x="3" y="8" rx="2"/><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 5.996-2.258 4 4 0 0 0 5.996 2.258 4 4 0 0 0-2.526-5.77A3 3 0 1 0 12 5"/><path d="M12 8v14M3 12h18"/></svg>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">rewards</span>
-            </button>
-            <button onclick="setActiveTab('progress')" class="nav-btn-mobile flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400" data-tab="progress">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">progress</span>
-            </button>
+        <div class="flex items-center justify-around max-w-md mx-auto" id="mobile-nav-container">
+            <!-- Rendered via JS to maintain active state logic -->
         </div>
     </div>
 
-    <div id="main-content" class="max-w-4xl mx-auto px-6 py-12">
+    <main class="max-w-4xl mx-auto px-4 py-8 md:py-12" id="main-view">
         
         <!-- Header -->
         <div class="flex items-center justify-between mb-10">
@@ -120,7 +107,7 @@
                 <p class="text-sm text-neutral-500 mt-1">Review your productivity trends and milestones.</p>
             </div>
             <div class="hidden md:flex p-2 bg-white border border-neutral-100 rounded-full shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="3" x2="21" y1="10" y2="10"/><line x1="9" x2="9" y1="21" y2="10"/></svg>
             </div>
         </div>
 
@@ -133,11 +120,11 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10" id="stats-grid">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <div class="p-2 bg-neutral-50 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <div class="p-2 bg-neutral-50 rounded-lg text-neutral-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     </div>
                 </div>
                 <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Tasks Done</p>
@@ -147,8 +134,8 @@
             
             <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <div class="p-2 bg-neutral-50 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><path d="m6 2 3 9 6-9 3 9-9 11-9-11z"/></svg>
+                    <div class="p-2 bg-neutral-50 rounded-lg text-neutral-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 2 3 9 6-9 3 9-9 11-9-11z"/></svg>
                     </div>
                 </div>
                 <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">XP Earned</p>
@@ -158,8 +145,8 @@
 
             <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <div class="p-2 bg-neutral-50 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div class="p-2 bg-neutral-50 rounded-lg text-neutral-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
                 </div>
                 <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Focus Time</p>
@@ -169,8 +156,8 @@
 
             <div class="bg-white border border-neutral-100 p-4 rounded-2xl shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <div class="p-2 bg-neutral-50 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-600"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    <div class="p-2 bg-neutral-50 rounded-lg text-neutral-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                     </div>
                 </div>
                 <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider">Completion</p>
@@ -180,11 +167,12 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6">
+            <!-- Tasks Chart -->
             <div class="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-sm font-semibold text-neutral-900">Tasks Completed</h3>
                     <div class="flex items-center gap-1.5 text-emerald-600 text-[10px] font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                         +12%
                     </div>
                 </div>
@@ -193,6 +181,7 @@
                 </div>
             </div>
 
+            <!-- XP Chart -->
             <div class="bg-white border border-neutral-100 rounded-2xl p-6 shadow-sm">
                 <h3 class="text-sm font-semibold text-neutral-900 mb-6">XP Growth</h3>
                 <div class="h-64 w-full">
@@ -200,6 +189,7 @@
                 </div>
             </div>
 
+            <!-- Calendar -->
             <div class="bg-white border border-neutral-100 rounded-xl p-6 shadow-sm relative">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -208,11 +198,11 @@
                     </div>
                     <div class="flex gap-2 items-center">
                         <button onclick="changeMonth(-1)" class="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
                         </button>
                         <span id="calendar-month" class="text-xs font-bold min-w-[90px] text-center text-neutral-700">December 2025</span>
                         <button onclick="changeMonth(1)" class="p-1.5 hover:bg-neutral-50 rounded-md border border-neutral-100 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
                     </div>
                 </div>
@@ -227,79 +217,88 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // State Management
-        let currentTab = 'analytics';
-        let xpScore = 450;
+        // Data & State
+        let activeTab = 'analytics';
+        let stats = { xp: 450, level: 12 };
+        const menuItems = [
+            { id: 'home', icon: 'Calendar', path: '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10" />' },
+            { id: 'tasks', icon: 'CheckCircle2', path: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4" />' },
+            { id: 'analytics', icon: 'BarChart2', path: '<path d="M18 20V10M12 20V4M6 20v-6" />' },
+            { id: 'rewards', icon: 'Gift', path: '<rect width="18" height="14" x="3" y="8" rx="2"/><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 5.996-2.258 4 4 0 0 0 5.996 2.258 4 4 0 0 0-2.526-5.77A3 3 0 1 0 12 5"/><path d="M12 8v14M3 12h18"/>' },
+            { id: 'progress', icon: 'TrendingUp', path: '<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>' },
+            { id: 'settings', icon: 'Settings', path: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3" />' }
+        ];
+
         const MOCK_LOGS = [];
         const MOCK_TASKS = [];
         const today = new Date();
 
-        function generateData() {
+        // Initialization
+        function init() {
+            generateMockData();
+            renderMobileNav();
+            renderDashboard();
+            renderCalendar();
+            document.getElementById('nav-xp-counter').innerText = stats.xp;
+        }
+
+        function generateMockData() {
             for (let i = 0; i < 90; i++) {
                 const date = new Date();
                 date.setDate(today.getDate() - i);
                 const dateStr = date.toISOString().split('T')[0];
                 const tasksDone = Math.floor(Math.random() * 8);
-                
                 MOCK_LOGS.push({
                     date: dateStr,
                     tasks_completed: tasksDone,
                     xp_earned: tasksDone * 50 + Math.floor(Math.random() * 100),
                     focus_minutes: tasksDone * 25 + Math.floor(Math.random() * 30),
                 });
-
                 for (let j = 0; j < 5; j++) {
-                    MOCK_TASKS.push({
-                        created_date: dateStr,
-                        status: Math.random() > 0.3 ? 'completed' : 'pending',
-                    });
+                    MOCK_TASKS.push({ created_date: dateStr, status: Math.random() > 0.3 ? 'completed' : 'pending' });
                 }
             }
         }
 
-        generateData();
+        function renderMobileNav() {
+            const container = document.getElementById('mobile-nav-container');
+            container.innerHTML = menuItems.map(item => `
+                <button onclick="setActiveTab('${item.id}')" 
+                        class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${activeTab === item.id ? 'text-neutral-900' : 'text-neutral-400'}">
+                    <svg class="w-6 h-6 ${activeTab === item.id ? 'scale-110' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        ${item.path}
+                    </svg>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">${item.id}</span>
+                </button>
+            `).join('');
+        }
 
+        function setActiveTab(tabId) {
+            activeTab = tabId;
+            renderMobileNav();
+            const mainView = document.getElementById('main-view');
+            
+            // Logic to simulate page switching
+            if (tabId !== 'analytics') {
+                mainView.innerHTML = `
+                    <div class="bg-white p-12 rounded-3xl border border-neutral-100 text-center">
+                        <h2 class="text-2xl font-bold capitalize">${tabId} View</h2>
+                        <p class="text-neutral-500 mt-2">Content for the ${tabId} section would go here.</p>
+                        <button onclick="location.reload()" class="mt-6 px-6 py-2 bg-neutral-900 text-white rounded-full font-bold text-sm">Back to Analytics</button>
+                    </div>
+                `;
+            } else {
+                location.reload(); // Hard reset for analytics to re-render charts easily
+            }
+        }
+
+        // Dashboard Logic
         let currentPeriod = 'week';
         let calendarDate = new Date();
         let tasksChart, xpChart;
-
-        function setActiveTab(tabId) {
-            currentTab = tabId;
-            
-            // Update Desktop Nav UI
-            document.querySelectorAll('.nav-btn-desktop').forEach(btn => {
-                if (btn.dataset.tab === tabId) btn.classList.add('nav-item-active');
-                else btn.classList.remove('nav-item-active');
-            });
-
-            // Update Mobile Nav UI
-            document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
-                const icon = btn.querySelector('svg');
-                if (btn.dataset.tab === tabId) {
-                    btn.classList.add('text-neutral-900');
-                    btn.classList.remove('text-neutral-400');
-                    icon.classList.add('scale-110');
-                } else {
-                    btn.classList.remove('text-neutral-900');
-                    btn.classList.add('text-neutral-400');
-                    icon.classList.remove('scale-110');
-                }
-            });
-
-            // Handle content visibility
-            const mainContent = document.getElementById('main-content');
-            if (tabId === 'analytics') {
-                mainContent.style.opacity = '1';
-                mainContent.style.pointerEvents = 'auto';
-            } else {
-                // Placeholder for other tabs
-                mainContent.style.opacity = '0.3';
-                mainContent.style.pointerEvents = 'none';
-            }
-        }
 
         function updatePeriod(period) {
             currentPeriod = period;
@@ -308,104 +307,54 @@
             renderDashboard();
         }
 
-        function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function getDatesForPeriod() {
+        function renderDashboard() {
             const dates = [];
-            let count = currentPeriod === 'week' ? 7 : 30;
+            const count = currentPeriod === 'week' ? 7 : 30;
             for (let i = count - 1; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(today.getDate() - i);
                 dates.push(d);
             }
-            return dates;
-        }
 
-        function renderDashboard() {
-            const dates = getDatesForPeriod();
             const labels = dates.map(d => currentPeriod === 'week' ? d.toLocaleDateString('en-US', {weekday: 'short'}) : d.getDate());
             const dateStrings = dates.map(d => d.toISOString().split('T')[0]);
-
             const chartData = dateStrings.map(ds => {
                 const log = MOCK_LOGS.find(l => l.date === ds);
-                return {
-                    tasks: log?.tasks_completed || 0,
-                    xp: log?.xp_earned || 0,
-                    focus: log?.focus_minutes || 0
-                };
+                return { tasks: log?.tasks_completed || 0, xp: log?.xp_earned || 0, focus: log?.focus_minutes || 0 };
             });
 
-            const stats = chartData.reduce((acc, curr) => ({
-                tasks: acc.tasks + curr.tasks,
-                xp: acc.xp + curr.xp,
-                focus: acc.focus + curr.focus
-            }), {tasks: 0, xp: 0, focus: 0});
-
+            const statsSum = chartData.reduce((acc, curr) => ({ tasks: acc.tasks + curr.tasks, xp: acc.xp + curr.xp, focus: acc.focus + curr.focus }), {tasks: 0, xp: 0, focus: 0});
             const totalTasksInPeriod = MOCK_TASKS.filter(t => dateStrings.includes(t.created_date));
             const completedInPeriod = totalTasksInPeriod.filter(t => t.status === 'completed');
             const rate = totalTasksInPeriod.length > 0 ? Math.round((completedInPeriod.length / totalTasksInPeriod.length) * 100) : 0;
 
-            document.getElementById('stat-tasks').innerText = stats.tasks;
-            document.getElementById('sub-tasks').innerText = (stats.tasks / dates.length).toFixed(1) + '/day avg';
-            document.getElementById('stat-xp').innerText = stats.xp.toLocaleString();
-            document.getElementById('sub-xp').innerText = Math.round(stats.xp / dates.length) + '/day avg';
-            document.getElementById('stat-focus').innerText = Math.floor(stats.focus / 60) + 'h ' + (stats.focus % 60) + 'm';
+            document.getElementById('stat-tasks').innerText = statsSum.tasks;
+            document.getElementById('sub-tasks').innerText = (statsSum.tasks / dates.length).toFixed(1) + '/day avg';
+            document.getElementById('stat-xp').innerText = statsSum.xp.toLocaleString();
+            document.getElementById('sub-xp').innerText = Math.round(statsSum.xp / dates.length) + '/day avg';
+            document.getElementById('stat-focus').innerText = Math.floor(statsSum.focus / 60) + 'h ' + (statsSum.focus % 60) + 'm';
             document.getElementById('stat-rate').innerText = rate + '%';
             document.getElementById('sub-rate').innerText = completedInPeriod.length + ' of ' + totalTasksInPeriod.length + ' tasks';
 
             if (tasksChart) tasksChart.destroy();
             if (xpChart) xpChart.destroy();
 
-            const ctxTasks = document.getElementById('tasksChart').getContext('2d');
-            tasksChart = new Chart(ctxTasks, {
+            tasksChart = new Chart(document.getElementById('tasksChart'), {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: chartData.map(d => d.tasks),
-                        backgroundColor: '#171717',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } },
-                        x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }
-                    }
-                }
+                data: { labels, datasets: [{ data: chartData.map(d => d.tasks), backgroundColor: '#171717', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }, x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } } } }
             });
 
-            const ctxXP = document.getElementById('xpChart').getContext('2d');
-            xpChart = new Chart(ctxXP, {
+            xpChart = new Chart(document.getElementById('xpChart'), {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: chartData.map(d => d.xp),
-                        borderColor: '#171717',
-                        backgroundColor: 'rgba(23, 23, 23, 0.05)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } },
-                        x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }
-                    }
-                }
+                data: { labels, datasets: [{ data: chartData.map(d => d.xp), borderColor: '#171717', backgroundColor: 'rgba(23, 23, 23, 0.05)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } }, x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10 } } } } }
             });
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
         }
 
         function renderCalendar() {
@@ -419,43 +368,32 @@
             const startOffset = firstDay === 0 ? 6 : firstDay - 1;
 
             ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = "text-[9px] font-bold text-neutral-400 text-center uppercase tracking-tighter mb-1";
-                dayHeader.innerText = d;
-                grid.appendChild(dayHeader);
+                grid.insertAdjacentHTML('beforeend', `<div class="text-[9px] font-bold text-neutral-400 text-center uppercase tracking-tighter mb-1">${d}</div>`);
             });
 
-            for (let i = 0; i < startOffset; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
+            for (let i = 0; i < startOffset; i++) grid.appendChild(document.createElement('div'));
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
                 const ds = date.toISOString().split('T')[0];
                 const log = MOCK_LOGS.find(l => l.date === ds);
                 const tasks = log?.tasks_completed || 0;
-
                 let colorClass = 'bg-neutral-100';
                 if (tasks > 5) colorClass = 'bg-emerald-600';
                 else if (tasks > 2) colorClass = 'bg-emerald-400';
                 else if (tasks > 0) colorClass = 'bg-emerald-200';
 
-                const cellWrapper = document.createElement('div');
-                cellWrapper.className = "flex flex-col items-center gap-1 group relative";
-                cellWrapper.innerHTML = `
-                    <div class="tooltip-custom">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}: ${tasks} tasks</div>
-                    <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-md ${colorClass} heat-cell cursor-pointer"></div>
-                    <span class="text-[9px] font-medium text-neutral-400">${day}</span>
-                `;
-                grid.appendChild(cellWrapper);
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="flex flex-col items-center gap-1 group relative">
+                        <div class="tooltip-custom">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}: ${tasks} tasks</div>
+                        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-md ${colorClass} heat-cell cursor-pointer"></div>
+                        <span class="text-[9px] font-medium text-neutral-400">${day}</span>
+                    </div>
+                `);
             }
         }
 
-        window.onload = () => {
-            renderDashboard();
-            renderCalendar();
-            document.getElementById('nav-xp-counter').innerText = xpScore;
-        };
+        window.onload = init;
     </script>
 </body>
 </html>
