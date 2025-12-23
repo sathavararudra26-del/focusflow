@@ -84,13 +84,14 @@
     const DesktopNav = ({ activeTab, setActiveTab, menuItems, xp }) => {
         return (
             <nav className="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
-                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setActiveTab('home')}>
-                        {/* Smaller, proportional logo container */}
-                        <div className="w-6 h-6 bg-neutral-900 rounded-md flex items-center justify-center text-white transition-transform group-hover:scale-105">
-                            <Icon name="Zap" className="w-4 h-4 fill-white" />
+                <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('home')}>
+                        {/* Enlarged Logo Container */}
+                        <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center text-white transition-transform group-hover:scale-105">
+                            <Icon name="Zap" className="w-6 h-6 fill-white" strokeWidth={3} />
                         </div>
-                        <span className="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
+                        {/* Brand Text made XL */}
+                        <span className="font-extrabold text-neutral-900 tracking-tighter text-2xl">FocusFlow</span>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -98,7 +99,7 @@
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
-                                className={`px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${
+                                className={`px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all ${
                                     activeTab === item.id
                                     ? 'bg-neutral-900 text-white'
                                     : 'text-neutral-500 hover:bg-neutral-100'
@@ -110,12 +111,12 @@
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
-                            <Icon name="Zap" className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                            <span className="text-xs font-black text-amber-700">{xp}</span>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full border border-amber-100">
+                            <Icon name="Zap" className="w-4 h-4 text-amber-500 fill-amber-500" />
+                            <span className="text-sm font-black text-amber-700">{xp}</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
-                            <Icon name="Bell" className="w-4 h-4 text-neutral-400" />
+                        <div className="w-10 h-10 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
+                            <Icon name="Bell" className="w-5 h-5 text-neutral-400" />
                         </div>
                     </div>
                 </div>
@@ -435,6 +436,3 @@
 </script>
 </body>
 </html>
-
-
-
