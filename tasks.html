@@ -85,13 +85,13 @@
         return (
             <nav className="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
                 <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('home')}>
-                        {/* Enlarged Logo Container */}
-                        <div className="w-10 h-10 bg-neutral-900 rounded-xl flex items-center justify-center text-white transition-transform group-hover:scale-105">
-                            <Icon name="Zap" className="w-6 h-6 fill-white" strokeWidth={3} />
+                    <div className="flex items-center gap-2.5 cursor-pointer group" onClick={() => setActiveTab('home')}>
+                        {/* Refined Logo Container - Adjusted to w-9 h-9 */}
+                        <div className="w-9 h-9 bg-neutral-900 rounded-[10px] flex items-center justify-center text-white transition-transform group-hover:scale-105">
+                            <Icon name="Zap" className="w-5 h-5 fill-white" strokeWidth={2.5} />
                         </div>
-                        {/* Brand Text made XL */}
-                        <span className="font-extrabold text-neutral-900 tracking-tighter text-2xl">FocusFlow</span>
+                        {/* Brand Text - Set to text-xl for standard 'big' but balanced look */}
+                        <span className="font-extrabold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -101,7 +101,7 @@
                                 onClick={() => setActiveTab(item.id)}
                                 className={`px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all ${
                                     activeTab === item.id
-                                    ? 'bg-neutral-900 text-white'
+                                    ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-900/10'
                                     : 'text-neutral-500 hover:bg-neutral-100'
                                 }`}
                             >
