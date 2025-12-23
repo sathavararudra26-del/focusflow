@@ -1,420 +1,273 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, Bell, Palette, Shield, Download, LogOut, 
-  ChevronRight, Crown, Check, X, 
-  Zap, Globe, Calendar, 
-  BarChart2, Settings as SettingsIcon, Gift, TrendingUp,
-  CheckCircle2
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow Settings</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .blur-bg { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        
+        /* Custom safe animations */
+        .modal-animate-in {
+            animation: modalIn 0.3s ease-out forwards;
+        }
+        .modal-animate-out {
+            animation: modalOut 0.2s ease-in forwards;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes modalOut {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.95) translateY(10px); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; y: 10px; }
+            to { opacity: 1; y: 0; }
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 pb-24 lg:pb-0">
 
-/**
- * REUSABLE UI COMPONENTS
- */
-
-const Button = ({ children, onClick, className = "", variant = "primary", disabled = false }) => {
-  const variants = {
-    primary: "bg-neutral-900 text-white hover:bg-neutral-800",
-    outline: "border border-neutral-200 text-neutral-600 hover:bg-neutral-50",
-    danger: "border border-red-200 text-red-600 hover:bg-red-50",
-    ghost: "text-neutral-500 hover:bg-neutral-100",
-  };
-  
-  return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      type="button"
-      className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center justify-center disabled:opacity-50 ${variants[variant]} ${className}`}
-    >
-      {children}
-    </button>
-  );
-};
-
-const Switch = ({ checked, onChange, disabled }) => (
-  <button
-    disabled={disabled}
-    type="button"
-    onClick={() => onChange(!checked)}
-    className={`w-10 h-5 rounded-full transition-colors relative ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${checked ? 'bg-indigo-600' : 'bg-neutral-200'}`}
-  >
-    <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
-  </button>
-);
-
-const Modal = ({ isOpen, onClose, title, description, children, footer }) => (
-  <AnimatePresence>
-    {isOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
-        >
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-neutral-900">{title}</h3>
-                {description && <p className="text-sm text-neutral-500 mt-1">{description}</p>}
-              </div>
-              <button onClick={onClose} className="p-1 hover:bg-neutral-100 rounded-full" type="button">
-                <X className="w-5 h-5 text-neutral-400" />
-              </button>
+    <!-- Desktop Navigation -->
+    <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 blur-bg hidden lg:block">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
+                    <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
+                </div>
+                <span class="font-bold tracking-tight text-lg">FocusFlow</span>
             </div>
-            {children}
-          </div>
-          {footer && (
-            <div className="p-4 bg-neutral-50 flex justify-end gap-2 border-t border-neutral-100">
-              {footer}
+            <div id="desktop-menu" class="flex items-center gap-1">
+                <!-- Menu items injected here -->
             </div>
-          )}
-        </motion.div>
-      </div>
-    )}
-  </AnimatePresence>
-);
-
-/**
- * NAVIGATION COMPONENTS
- */
-
-const NavIcon = ({ name, className = "w-5 h-5" }) => {
-  const icons = {
-    home: <Calendar className={className} />,
-    tasks: <CheckCircle2 className={className} />,
-    analytics: <BarChart2 className={className} />,
-    rewards: <Gift className={className} />,
-    progress: <TrendingUp className={className} />,
-    settings: <SettingsIcon className={className} />
-  };
-  return icons[name] || <Calendar className={className} />;
-};
-
-const DesktopNav = ({ activeTab, setActiveTab, menuItems, xp }) => (
-  <nav className="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
-    <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
-          <Zap className="w-4 h-4 fill-white text-white" />
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
+                    <span class="text-xs font-black text-amber-700">450 XP</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
+                    <i data-lucide="bell" class="w-4 h-4 text-neutral-400"></i>
+                </div>
+            </div>
         </div>
-        <span className="font-bold text-neutral-900 tracking-tight text-lg">FocusFlow</span>
-      </div>
+    </nav>
 
-      <div className="flex items-center gap-1">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setActiveTab(item.id)}
-            className={`px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${
-              activeTab === item.id
-                ? 'bg-neutral-900 text-white shadow-lg shadow-neutral-200'
-                : 'text-neutral-500 hover:bg-neutral-100'
-            }`}
-          >
-            {item.id}
-          </button>
-        ))}
-      </div>
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-8 md:py-12 fade-in">
+        <header class="mb-8 text-left">
+            <h1 class="text-3xl font-bold tracking-tight">Settings</h1>
+            <p class="text-neutral-500">Manage your account and preferences.</p>
+        </header>
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
-          <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-xs font-black text-amber-700">{xp} XP</span>
+        <!-- Pro Card -->
+        <div class="relative overflow-hidden bg-neutral-900 rounded-2xl p-6 mb-10 text-white shadow-xl shadow-neutral-200">
+            <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            <div class="relative flex items-center gap-4 mb-6">
+                <div class="p-3 bg-white/10 rounded-xl blur-bg">
+                    <i data-lucide="crown" class="w-6 h-6 text-indigo-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold">Productivity Pro</h3>
+                    <p class="text-sm text-neutral-400">Unlock your full potential</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-sm text-neutral-300" id="pro-features">
+                <!-- Features injected here -->
+            </div>
+            <button onclick="toggleModal('upgrade-modal', true)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-lg font-bold transition-all shadow-lg shadow-indigo-500/20">
+                Upgrade Now — $4.99/mo
+            </button>
         </div>
-        <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
-          <Bell className="w-4 h-4 text-neutral-400" />
+
+        <!-- Settings Sections -->
+        <div id="settings-container" class="space-y-8">
+            <!-- Sections injected here -->
         </div>
-      </div>
+
+        <!-- Sign Out -->
+        <div class="mt-12 pt-8 border-t border-neutral-200">
+            <button onclick="location.reload()" class="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 hover:bg-red-50 py-3 rounded-lg font-medium transition-all">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+            </button>
+            <p class="text-center text-[10px] text-neutral-400 mt-4">Version 2.4.0 — FocusFlow</p>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 blur-bg border-t border-neutral-100 p-2 lg:hidden">
+        <div id="mobile-menu" class="flex items-center justify-around max-w-md mx-auto">
+            <!-- Mobile items injected here -->
+        </div>
     </div>
-  </nav>
-);
 
-const MobileNav = ({ activeTab, setActiveTab, menuItems }) => (
-  <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
-    <div className="flex items-center justify-around max-w-md mx-auto">
-      {menuItems.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          onClick={() => setActiveTab(item.id)}
-          className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${
-            activeTab === item.id ? 'text-neutral-900' : 'text-neutral-400'
-          }`}
-        >
-          <NavIcon
-            name={item.id}
-            className={`w-6 h-6 transition-transform ${activeTab === item.id ? 'scale-110' : ''}`}
-          />
-          <span className="text-[10px] font-bold uppercase tracking-tighter">
-            {item.id}
-          </span>
-        </button>
-      ))}
-    </div>
-  </div>
-);
-
-/**
- * SETTINGS VIEW COMPONENT
- */
-
-const SettingsView = ({ user, notifications, setNotifications, setShowUpgrade, setShowExport, handleLogout }) => {
-  const proFeatures = [
-    'Unlimited tasks & projects',
-    'Advanced data analytics',
-    'Dynamic reward multipliers',
-    'Streak protection (1 freeze/mo)',
-    'Full Dark Mode experience',
-    'Priority email support',
-  ];
-
-  const sections = [
-    {
-      title: 'Account',
-      items: [
-        { icon: User, label: 'Profile', description: user.email, action: () => {} },
-        { icon: Globe, label: 'Language', description: 'English (US)', action: () => {} }
-      ],
-    },
-    {
-      title: 'Preferences',
-      items: [
-        { icon: Bell, label: 'Notifications', description: 'Task reminders and activity alerts', toggle: true, value: notifications, onChange: setNotifications },
-        { icon: Palette, label: 'Appearance', description: 'Dark mode is a Pro feature', toggle: true, disabled: true, value: false },
-      ],
-    },
-    {
-      title: 'Data & Security',
-      items: [
-        { icon: Download, label: 'Export Data', description: 'Download a JSON of your progress', action: () => setShowExport(true) },
-        { icon: Shield, label: 'Privacy', description: 'Manage your visibility and data', action: () => {} },
-      ],
-    },
-  ];
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Settings</h1>
-        <p className="text-neutral-500">Manage your account and preferences.</p>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden bg-neutral-900 rounded-2xl p-6 mb-10 text-white shadow-xl shadow-neutral-200"
-      >
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="relative flex items-center gap-4 mb-6">
-          <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-            <Crown className="w-6 h-6 text-indigo-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold">Productivity Pro</h3>
-            <p className="text-sm text-neutral-400">Unlock your full potential</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-sm text-neutral-300">
-          {proFeatures.map((f, i) => (
-            <div key={i} className="flex items-center gap-2.5">
-              <div className="bg-indigo-500/20 p-0.5 rounded-full"><Check className="w-3.5 h-3.5 text-indigo-400" /></div>
-              {f}
+    <!-- Upgrade Modal -->
+    <div id="upgrade-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 blur-bg" onclick="toggleModal('upgrade-modal', false)"></div>
+        <div class="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 modal-content">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold">Choose a Plan</h3>
+                    <p class="text-sm text-neutral-500">Supercharge your productivity.</p>
+                </div>
+                <button onclick="toggleModal('upgrade-modal', false)" class="p-1 hover:bg-neutral-100 rounded-full"><i data-lucide="x" class="w-5 h-5 text-neutral-400"></i></button>
             </div>
-          ))}
-        </div>
-        <Button onClick={() => setShowUpgrade(true)} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 h-auto">
-          Upgrade Now — $4.99/mo
-        </Button>
-      </motion.div>
-
-      <div className="space-y-8">
-        {sections.map((section) => (
-          <div key={section.title}>
-            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3 ml-1">
-              {section.title}
-            </h3>
-            <div className="bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm divide-y divide-neutral-50">
-              {section.items.map((item, i) => {
-                const ItemIcon = item.icon;
-                return (
-                  <div 
-                    key={i} 
-                    role="button"
-                    tabIndex={0}
-                    onClick={!item.toggle ? item.action : undefined} 
-                    onKeyPress={(e) => { if (e.key === 'Enter' && !item.toggle) item.action(); }}
-                    className={`flex items-center justify-between px-5 py-4 outline-none transition-colors ${item.action && !item.toggle ? 'cursor-pointer hover:bg-neutral-50 focus:bg-neutral-50' : ''} ${item.disabled ? 'opacity-50' : ''}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-neutral-50 rounded-xl text-neutral-600">
-                        <ItemIcon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-neutral-900">{item.label}</p>
-                        <p className="text-xs text-neutral-500">{item.description}</p>
-                      </div>
+            <div class="space-y-4 py-2">
+                <div class="p-4 border-2 border-indigo-600 rounded-xl bg-indigo-50/50 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm font-bold text-indigo-900">Annual Pro</p>
+                        <p class="text-xs text-indigo-700">$39.99 / year</p>
                     </div>
-                    {item.toggle ? (
-                      <Switch checked={item.value} onChange={item.onChange} disabled={item.disabled} />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-neutral-300" />
-                    )}
-                  </div>
-                );
-              })}
+                    <div class="bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase">Save 33%</div>
+                </div>
+                <div class="p-4 border border-neutral-200 rounded-xl flex justify-between items-center text-neutral-400 italic">
+                    <div>
+                        <p class="text-sm font-bold">Monthly Pro</p>
+                        <p class="text-xs">$4.99 / month</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('upgrade-modal', false)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-lg font-bold">Proceed to Checkout</button>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-12 pt-8 border-t border-neutral-200">
-        <Button onClick={handleLogout} variant="outline" className="w-full text-red-600 hover:bg-red-50 py-3">
-          <LogOut className="w-4 h-4 mr-2" />Sign Out
-        </Button>
-        <p className="text-center text-[10px] text-neutral-400 mt-4">Version 2.4.0 — FocusFlow</p>
-      </div>
+        </div>
     </div>
-  );
-};
 
-/**
- * MAIN APP CONTAINER (DEFAULT EXPORT)
- */
+    <script>
+        // Data Configuration
+        const menuItems = ['home', 'tasks', 'analytics', 'rewards', 'progress', 'settings'];
+        const proFeatures = [
+            'Unlimited tasks & projects',
+            'Advanced data analytics',
+            'Dynamic reward multipliers',
+            'Streak protection (1 freeze/mo)',
+            'Full Dark Mode experience',
+            'Priority email support'
+        ];
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('settings');
-  const [xp] = useState(450);
-  const [showUpgrade, setShowUpgrade] = useState(false);
-  const [showExport, setShowExport] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [user] = useState({ email: 'alex.doe@example.com', name: 'Alex Doe' });
-  const [exporting, setExporting] = useState(false);
+        const sections = [
+            {
+                title: 'Account',
+                items: [
+                    { icon: 'user', label: 'Profile', desc: 'alex.doe@example.com' },
+                    { icon: 'globe', label: 'Language', desc: 'English (US)' }
+                ]
+            },
+            {
+                title: 'Preferences',
+                items: [
+                    { icon: 'bell', label: 'Notifications', desc: 'Task reminders and activity alerts', toggle: true, checked: true },
+                    { icon: 'palette', label: 'Appearance', desc: 'Dark mode is a Pro feature', toggle: true, checked: false, disabled: true }
+                ]
+            },
+            {
+                title: 'Data & Security',
+                items: [
+                    { icon: 'download', label: 'Export Data', desc: 'Download a JSON backup', action: 'export' },
+                    { icon: 'shield', label: 'Privacy', desc: 'Manage visibility settings' }
+                ]
+            }
+        ];
 
-  const menuItems = [
-    { id: 'home' },
-    { id: 'tasks' },
-    { id: 'analytics' },
-    { id: 'rewards' },
-    { id: 'progress' },
-    { id: 'settings' }
-  ];
+        // Initialization
+        function init() {
+            renderDesktopNav();
+            renderMobileNav();
+            renderProFeatures();
+            renderSettings();
+            lucide.createIcons(); // Initialize all icons
+        }
 
-  const handleExport = () => {
-    setExporting(true);
-    setTimeout(() => {
-      const exportData = { 
-        exported_at: new Date().toISOString(), 
-        user: { email: user.email }, 
-        stats: { xp } 
-      };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `focusflow-export.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setExporting(false);
-      setShowExport(false);
-    }, 1000);
-  };
+        function renderDesktopNav() {
+            const container = document.getElementById('desktop-menu');
+            container.innerHTML = menuItems.map(item => `
+                <button class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${item === 'settings' ? 'bg-neutral-900 text-white shadow-lg' : 'text-neutral-500 hover:bg-neutral-100'}">
+                    ${item}
+                </button>
+            `).join('');
+        }
 
-  return (
-    <div className="min-h-screen bg-neutral-50 pb-24 lg:pb-0">
-      <DesktopNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        menuItems={menuItems} 
-        xp={xp} 
-      />
+        function renderMobileNav() {
+            const container = document.getElementById('mobile-menu');
+            container.innerHTML = menuItems.map(item => `
+                <button class="flex flex-col items-center gap-1 p-2 transition-all ${item === 'settings' ? 'text-neutral-900' : 'text-neutral-400'}">
+                    <i data-lucide="${getIconName(item)}" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">${item}</span>
+                </button>
+            `).join('');
+        }
 
-      <main className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        {activeTab === 'settings' ? (
-          <SettingsView 
-            user={user}
-            notifications={notifications}
-            setNotifications={setNotifications}
-            setShowUpgrade={setShowUpgrade}
-            setShowExport={setShowExport}
-            handleLogout={() => window.location.reload()}
-          />
-        ) : (
-          <div className="bg-white p-20 rounded-3xl border border-neutral-100 text-center shadow-sm">
-            <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <NavIcon name={activeTab} className="w-8 h-8 text-neutral-400" />
-            </div>
-            <h2 className="text-2xl font-bold capitalize text-neutral-900">{activeTab} View</h2>
-            <p className="text-neutral-500 mt-2">The {activeTab} dashboard features are coming soon!</p>
-            <Button onClick={() => setActiveTab('settings')} variant="ghost" className="mt-6">
-              Return to Settings
-            </Button>
-          </div>
-        )}
-      </main>
+        function renderProFeatures() {
+            const container = document.getElementById('pro-features');
+            container.innerHTML = proFeatures.map(f => `
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-indigo-500/20 p-0.5 rounded-full"><i data-lucide="check" class="w-3.5 h-3.5 text-indigo-400"></i></div>
+                    ${f}
+                </div>
+            `).join('');
+        }
 
-      <MobileNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        menuItems={menuItems} 
-      />
+        function renderSettings() {
+            const container = document.getElementById('settings-container');
+            container.innerHTML = sections.map(section => `
+                <div>
+                    <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3 ml-1 text-left">${section.title}</h3>
+                    <div class="bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm divide-y divide-neutral-50">
+                        ${section.items.map(item => `
+                            <div class="flex items-center justify-between px-5 py-4 transition-all ${item.toggle ? '' : 'cursor-pointer hover:bg-neutral-50'} ${item.disabled ? 'opacity-50' : ''}">
+                                <div class="flex items-center gap-4 text-left">
+                                    <div class="p-2.5 bg-neutral-50 rounded-xl text-neutral-600">
+                                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-neutral-900">${item.label}</p>
+                                        <p class="text-xs text-neutral-500">${item.desc}</p>
+                                    </div>
+                                </div>
+                                ${item.toggle ? `
+                                    <button class="w-10 h-5 rounded-full transition-colors relative ${item.checked ? 'bg-indigo-600' : 'bg-neutral-200'}" ${item.disabled ? 'disabled' : ''}>
+                                        <div class="absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${item.checked ? 'translate-x-5' : ''}"></div>
+                                    </button>
+                                ` : `<i data-lucide="chevron-right" class="w-4 h-4 text-neutral-300"></i>`}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      <Modal 
-        isOpen={showUpgrade} 
-        onClose={() => setShowUpgrade(false)} 
-        title="Choose a Plan" 
-        description="Supercharge your productivity."
-      >
-        <div className="space-y-4 py-2">
-          <div className="p-4 border-2 border-indigo-600 rounded-xl bg-indigo-50/50 flex justify-between items-center">
-            <div>
-              <p className="text-sm font-bold text-indigo-900">Annual Pro</p>
-              <p className="text-xs text-indigo-700">$39.99 / year</p>
-            </div>
-            <div className="bg-indigo-600 text-white text-[10px] px-2 py-1 rounded-full font-bold uppercase">Save 33%</div>
-          </div>
-          <div className="p-4 border border-neutral-200 rounded-xl flex justify-between items-center">
-            <div>
-              <p className="text-sm font-bold text-neutral-900">Monthly Pro</p>
-              <p className="text-xs text-neutral-500">$4.99 / month</p>
-            </div>
-          </div>
-          <Button onClick={() => setShowUpgrade(false)} className="w-full mt-4 bg-indigo-600 text-white">
-            Proceed to Checkout
-          </Button>
-        </div>
-      </Modal>
+        function getIconName(tab) {
+            const map = { home: 'calendar', tasks: 'check-circle-2', analytics: 'bar-chart-2', rewards: 'gift', progress: 'trending-up', settings: 'settings' };
+            return map[tab] || 'calendar';
+        }
 
-      <Modal 
-        isOpen={showExport} 
-        onClose={() => setShowExport(false)} 
-        title="Export Data" 
-        description="Download your progress backup."
-      >
-        <div className="py-4 text-center">
-          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Download className="w-8 h-8" />
-          </div>
-          <p className="text-sm text-neutral-600">Your activity history will be exported as a JSON file.</p>
-        </div>
-        <div className="flex flex-col gap-2 mt-4">
-          <Button onClick={handleExport} disabled={exporting} className="w-full">
-            {exporting ? 'Preparing...' : 'Download Now'}
-          </Button>
-          <Button onClick={() => setShowExport(false)} variant="ghost" className="w-full">
-            Cancel
-          </Button>
-        </div>
-      </Modal>
-    </div>
-  );
-}
+        function toggleModal(id, show) {
+            const modal = document.getElementById(id);
+            const content = modal.querySelector('.modal-content');
+            
+            if (show) {
+                modal.classList.remove('hidden');
+                content.classList.remove('modal-animate-out');
+                content.classList.add('modal-animate-in');
+            } else {
+                content.classList.remove('modal-animate-in');
+                content.classList.add('modal-animate-out');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
