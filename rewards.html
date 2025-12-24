@@ -1,344 +1,407 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import Icon from '@/components/shared/Icon';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards - XP Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Animations */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-const RewardForm = ({ onSave, onCancel }) => {
-  const [title, setTitle] = useState('');
-  const [xpCost, setXpCost] = useState('');
+        .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        .animate-scale-in { animation: scaleIn 0.2s ease-out forwards; }
+        
+        .reward-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!title || !xpCost) return;
-    onSave({ title, xp_cost: parseInt(xpCost) });
-    setTitle('');
-    setXpCost('');
-  };
+        .hidden-form {
+            display: none;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="bg-white border-2 border-dashed border-neutral-200 p-6 rounded-2xl mb-6"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-700">Reward Name</label>
-            <input
-              type="text"
-              placeholder="e.g. 15 min Break"
-              className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-700">XP Cost</label>
-            <div className="relative">
-              <Icon name="Zap" className="absolute left-3 top-3.5 w-4 h-4 text-neutral-400" />
-              <input
-                type="number"
-                placeholder="500"
-                className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
-                value={xpCost}
-                onChange={(e) => setXpCost(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-neutral-600 hover:bg-neutral-100 rounded-lg font-medium transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-neutral-900 text-white rounded-lg font-bold hover:bg-neutral-800 transition-colors"
-          >
-            Create Reward
-          </button>
-        </div>
-      </form>
-    </motion.div>
-  );
-};
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e5e5; border-radius: 10px; }
 
-const RewardCard = ({ reward, availableXP, onRedeem, onDelete }) => {
-  const canAfford = availableXP >= reward.xp_cost;
+        /* Ensure content doesn't get hidden behind mobile nav */
+        body { padding-bottom: 80px; }
+        @media (min-width: 1024px) {
+            body { padding-bottom: 0; }
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 font-sans antialiased min-h-screen">
 
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className={`bg-white border border-neutral-100 rounded-2xl shadow-sm overflow-hidden transition-all ${
-        reward.is_unlocked ? 'opacity-60' : 'hover:border-neutral-200 hover:shadow-md'
-      }`}
-    >
-      <div className="p-5 flex items-start gap-4">
-        <div className={`p-3 rounded-xl ${reward.is_unlocked ? 'bg-neutral-200 text-neutral-500' : 'bg-neutral-100 text-neutral-900'}`}>
-          <Icon name="Gift" className="w-6 h-6" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-neutral-900 truncate">{reward.title}</h3>
-          <div className="flex items-center gap-1.5 mt-1">
-            <Icon name="Zap" className={`w-4 h-4 ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-500 fill-amber-500'}`} />
-            <span className={`text-sm font-bold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}`}>
-              {reward.xp_cost} XP
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {reward.is_unlocked ? (
-            <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
-              <Icon name="CheckCircle2" className="w-4 h-4" />
-              Redeemed
-            </span>
-          ) : (
-            <>
-              <button
-                onClick={() => onRedeem(reward)}
-                disabled={!canAfford}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  canAfford
-                    ? 'bg-neutral-900 text-white hover:bg-neutral-800'
-                    : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                }`}
-              >
-                Redeem
-              </button>
-              <button
-                onClick={() => onDelete(reward.id)}
-                className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Icon name="Trash2" className="w-4 h-4 text-neutral-400 hover:text-red-500" />
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-      {!reward.is_unlocked && !canAfford && (
-        <div className="px-5 pb-4">
-          <p className="text-xs text-red-500 flex items-center gap-1">
-            <Icon name="X" className="w-3 h-3" />
-            Need {reward.xp_cost - availableXP} more XP
-          </p>
-        </div>
-      )}
-    </motion.div>
-  );
-};
-
-export default function Rewards() {
-  const [showForm, setShowForm] = useState(false);
-  const [filter, setFilter] = useState('available');
-  const queryClient = useQueryClient();
-
-  const { data: rewards = [] } = useQuery({
-    queryKey: ['rewards'],
-    queryFn: () => base44.entities.Reward.list('-created_date', 100)
-  });
-
-  const { data: userProgress } = useQuery({
-    queryKey: ['userProgress'],
-    queryFn: async () => {
-      const progress = await base44.entities.UserProgress.list();
-      return progress[0] || { total_xp: 0 };
-    }
-  });
-
-  const createRewardMutation = useMutation({
-    mutationFn: (data) => base44.entities.Reward.create({ ...data, is_unlocked: false }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['rewards'] });
-      setShowForm(false);
-    }
-  });
-
-  const redeemRewardMutation = useMutation({
-    mutationFn: async (reward) => {
-      await base44.entities.Reward.update(reward.id, {
-        is_unlocked: true,
-        redeemed_date: new Date().toISOString().split('T')[0]
-      });
-      if (userProgress) {
-        await base44.entities.UserProgress.update(userProgress.id, {
-          total_xp: userProgress.total_xp - reward.xp_cost
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['rewards'] });
-      queryClient.invalidateQueries({ queryKey: ['userProgress'] });
-    }
-  });
-
-  const deleteRewardMutation = useMutation({
-    mutationFn: (id) => base44.entities.Reward.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['rewards'] })
-  });
-
-  const availableXP = userProgress?.total_xp || 0;
-  
-  const filteredRewards = filter === 'redeemed' 
-    ? rewards.filter(r => r.is_unlocked)
-    : rewards.filter(r => !r.is_unlocked);
-
-  const totalRedeemed = rewards.filter(r => r.is_unlocked).length;
-  const totalSpent = rewards.filter(r => r.is_unlocked).reduce((sum, r) => sum + r.xp_cost, 0);
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Rewards</h1>
-          <p className="text-neutral-500 mt-1">Redeem your hard-earned XP.</p>
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white font-bold rounded-full shadow-lg"
-        >
-          <Icon name="Plus" className="w-5 h-5" />
-          <span className="hidden sm:inline">New Reward</span>
-        </motion.button>
-      </div>
-
-      {/* XP Balance Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-neutral-900 text-white p-6 rounded-3xl mb-8"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-neutral-400 text-sm font-medium">Available XP</p>
-            <div className="flex items-center gap-2 mt-1">
-              <Icon name="Zap" className="w-8 h-8 text-amber-400 fill-amber-400" />
-              <span className="text-4xl font-extrabold">{availableXP}</span>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-neutral-400 text-sm">{totalRedeemed} rewards redeemed</p>
-            <p className="text-neutral-400 text-sm">{totalSpent} XP spent</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Create Form */}
-      <AnimatePresence>
-        {showForm && (
-          <RewardForm
-            onSave={(data) => createRewardMutation.mutate(data)}
-            onCancel={() => setShowForm(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setFilter('available')}
-          className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-            filter === 'available'
-              ? 'bg-neutral-900 text-white'
-              : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
-          }`}
-        >
-          Available ({rewards.filter(r => !r.is_unlocked).length})
-        </button>
-        <button
-          onClick={() => setFilter('redeemed')}
-          className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-            filter === 'redeemed'
-              ? 'bg-neutral-900 text-white'
-              : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
-          }`}
-        >
-          Redeemed ({totalRedeemed})
-        </button>
-      </div>
-
-      {/* Rewards Grid */}
-      {filteredRewards.length === 0 ? (
-        <div className="bg-white border border-neutral-100 p-12 rounded-3xl text-center">
-          <div className="w-20 h-20 bg-neutral-100 rounded-3xl mx-auto mb-4 flex items-center justify-center">
-            <Icon name="Gift" className="w-10 h-10 text-neutral-400" />
-          </div>
-          <h3 className="text-xl font-bold text-neutral-900 mb-2">
-            {filter === 'redeemed' ? 'No redeemed rewards yet' : 'No rewards available'}
-          </h3>
-          <p className="text-neutral-500 mb-6">
-            {filter === 'redeemed' 
-              ? 'Complete tasks to earn XP and redeem rewards!' 
-              : 'Create custom rewards to motivate yourself.'}
-          </p>
-          {filter === 'available' && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-6 py-3 bg-neutral-900 text-white font-bold rounded-full"
-            >
-              Create Reward
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          <AnimatePresence>
-            {filteredRewards.map(reward => (
-              <RewardCard
-                key={reward.id}
-                reward={reward}
-                availableXP={availableXP}
-                onRedeem={(r) => redeemRewardMutation.mutate(r)}
-                onDelete={(id) => deleteRewardMutation.mutate(id)}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Suggested Rewards */}
-      {rewards.filter(r => !r.is_unlocked).length === 0 && filter === 'available' && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-8"
-        >
-          <h3 className="font-bold text-neutral-900 mb-4">Suggested Rewards</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              { title: '15 min Break', xp_cost: 100 },
-              { title: 'Favorite Snack', xp_cost: 250 },
-              { title: 'Episode of TV Show', xp_cost: 500 }
-            ].map((suggestion, i) => (
-              <button
-                key={i}
-                onClick={() => createRewardMutation.mutate(suggestion)}
-                className="bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all"
-              >
-                <h4 className="font-medium text-neutral-900">{suggestion.title}</h4>
-                <div className="flex items-center gap-1 mt-1 text-amber-600">
-                  <Icon name="Zap" className="w-3 h-3" />
-                  <span className="text-sm font-bold">{suggestion.xp_cost} XP</span>
+    <!-- Desktop Navigation Bar -->
+    <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
+                    <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
                 </div>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      )}
+                <span class="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
+            </a>
+
+            <div class="flex items-center gap-1">
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize text-neutral-500 hover:bg-neutral-100 transition-all">home</a>
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize text-neutral-500 hover:bg-neutral-100 transition-all">tasks</a>
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize text-neutral-500 hover:bg-neutral-100 transition-all">analytics</a>
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize bg-neutral-900 text-white transition-all">rewards</a>
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize text-neutral-500 hover:bg-neutral-100 transition-all">progress</a>
+                <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize text-neutral-500 hover:bg-neutral-100 transition-all">settings</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
+                    <span id="navXP" class="text-xs font-black text-amber-700">0</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
+                    <i data-lucide="bell" class="w-4 h-4 text-neutral-400"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">Rewards</h1>
+                <p class="text-neutral-500 mt-1">Redeem your hard-earned XP.</p>
+            </div>
+            <button id="toggleFormBtn" class="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white font-bold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">New Reward</span>
+            </button>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="animate-slide-up bg-neutral-900 text-white p-6 rounded-3xl mb-8 shadow-xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-neutral-400 text-sm font-medium">Available XP</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <i data-lucide="zap" class="w-8 h-8 text-amber-400 fill-amber-400"></i>
+                        <span id="displayXP" class="text-4xl font-bold tracking-tight">0</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p id="totalRedeemedText" class="text-neutral-400 text-sm">0 rewards redeemed</p>
+                    <p id="totalSpentText" class="text-neutral-400 text-sm">0 XP spent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reward Form -->
+        <div id="rewardFormContainer" class="hidden-form bg-white border-2 border-dashed border-neutral-200 p-6 rounded-2xl mb-6 transition-all duration-300">
+            <form id="rewardForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-neutral-700">Reward Name</label>
+                        <input id="rewardTitle" type="text" placeholder="e.g. 15 min Break" required
+                            class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-neutral-700">XP Cost</label>
+                        <div class="relative">
+                            <i data-lucide="zap" class="absolute left-3 top-3.5 w-4 h-4 text-neutral-400"></i>
+                            <input id="rewardXP" type="number" placeholder="500" required
+                                class="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="cancelFormBtn" class="px-4 py-2 text-neutral-600 hover:bg-neutral-100 rounded-lg font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-neutral-900 text-white rounded-lg font-bold hover:bg-neutral-800 transition-colors">
+                        Create Reward
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button id="filterAvailable" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white">
+                Available (<span id="countAvailable">0</span>)
+            </button>
+            <button id="filterRedeemed" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
+                Redeemed (<span id="countRedeemed">0</span>)
+            </button>
+        </div>
+
+        <!-- Rewards List -->
+        <div id="rewardsList" class="grid gap-4"></div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden bg-white border border-neutral-100 p-12 rounded-3xl text-center">
+            <div class="w-20 h-20 bg-neutral-100 rounded-3xl mx-auto mb-4 flex items-center justify-center">
+                <i data-lucide="gift" class="w-10 h-10 text-neutral-400"></i>
+            </div>
+            <h3 id="emptyTitle" class="text-xl font-bold text-neutral-900 mb-2">No rewards available</h3>
+            <p id="emptyText" class="text-neutral-500 mb-6">Create custom rewards to motivate yourself.</p>
+            <button id="emptyCta" class="px-6 py-3 bg-neutral-900 text-white font-bold rounded-full">
+                Create Reward
+            </button>
+        </div>
+
+        <!-- Suggestions -->
+        <div id="suggestionsSection" class="mt-8 hidden">
+            <h3 class="font-bold text-neutral-900 mb-4">Suggested Rewards</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <button onclick="addSuggested('15 min Break', 100)" class="bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all group">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-neutral-950">15 min Break</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-semibold">100 XP</span>
+                    </div>
+                </button>
+                <button onclick="addSuggested('Favorite Snack', 250)" class="bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all group">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-neutral-950">Favorite Snack</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-semibold">250 XP</span>
+                    </div>
+                </button>
+                <button onclick="addSuggested('Episode of TV Show', 500)" class="bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all group">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-neutral-950">Episode of TV Show</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-semibold">500 XP</span>
+                    </div>
+                </button>
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <!-- Mobile Navigation Bar -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
+        <div class="flex items-center justify-around max-w-md mx-auto">
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
+                <i data-lucide="calendar" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
+                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">tasks</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
+                <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">analytics</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-900">
+                <i data-lucide="gift" class="w-6 h-6 scale-110"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">rewards</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
+                <i data-lucide="trending-up" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">progress</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
+                <i data-lucide="settings" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold uppercase tracking-tighter">settings</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- INITIAL STATE ---
+        let state = {
+            total_xp: 1200,
+            rewards: [
+                { id: '1', title: 'Coffee Break', xp_cost: 50, is_unlocked: false },
+                { id: '2', title: 'Video Games', xp_cost: 300, is_unlocked: true },
+            ],
+            filter: 'available',
+            formOpen: false
+        };
+
+        const elements = {
+            list: document.getElementById('rewardsList'),
+            displayXP: document.getElementById('displayXP'),
+            navXP: document.getElementById('navXP'),
+            totalRedeemed: document.getElementById('totalRedeemedText'),
+            totalSpent: document.getElementById('totalSpentText'),
+            formContainer: document.getElementById('rewardFormContainer'),
+            toggleBtn: document.getElementById('toggleFormBtn'),
+            rewardForm: document.getElementById('rewardForm'),
+            filterAvailable: document.getElementById('filterAvailable'),
+            filterRedeemed: document.getElementById('filterRedeemed'),
+            countAvailable: document.getElementById('countAvailable'),
+            countRedeemed: document.getElementById('countRedeemed'),
+            emptyState: document.getElementById('emptyState'),
+            emptyTitle: document.getElementById('emptyTitle'),
+            emptyText: document.getElementById('emptyText'),
+            suggestions: document.getElementById('suggestionsSection')
+        };
+
+        function render() {
+            // Update XP displays in both card and navbar
+            elements.displayXP.textContent = state.total_xp;
+            if (elements.navXP) elements.navXP.textContent = state.total_xp;
+
+            const redeemedCount = state.rewards.filter(r => r.is_unlocked).length;
+            const totalSpent = state.rewards.filter(r => r.is_unlocked).reduce((s, r) => s + r.xp_cost, 0);
+            
+            elements.totalRedeemed.textContent = `${redeemedCount} rewards redeemed`;
+            elements.totalSpent.textContent = `${totalSpent} XP spent`;
+            elements.countAvailable.textContent = state.rewards.filter(r => !r.is_unlocked).length;
+            elements.countRedeemed.textContent = redeemedCount;
+
+            const filtered = state.rewards.filter(r => 
+                state.filter === 'redeemed' ? r.is_unlocked : !r.is_unlocked
+            );
+
+            if (filtered.length === 0) {
+                elements.list.innerHTML = '';
+                elements.emptyState.classList.remove('hidden');
+                elements.emptyTitle.textContent = state.filter === 'redeemed' ? 'No redeemed rewards yet' : 'No rewards available';
+                elements.emptyText.textContent = state.filter === 'redeemed' ? 'Complete tasks to earn XP!' : 'Create custom rewards to motivate yourself.';
+            } else {
+                elements.emptyState.classList.add('hidden');
+                elements.list.innerHTML = filtered.map(reward => createRewardHTML(reward)).join('');
+            }
+
+            const hasAvailable = state.rewards.some(r => !r.is_unlocked);
+            if (!hasAvailable && state.filter === 'available') {
+                elements.suggestions.classList.remove('hidden');
+            } else {
+                elements.suggestions.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        function createRewardHTML(reward) {
+            const canAfford = state.total_xp >= reward.xp_cost;
+            const cardClasses = reward.is_unlocked 
+                ? 'opacity-60 bg-white border border-neutral-100' 
+                : 'bg-white border border-neutral-100 hover:border-neutral-200 hover:shadow-md';
+
+            return `
+                <div class="reward-item animate-scale-in rounded-2xl overflow-hidden shadow-sm ${cardClasses}">
+                    <div class="p-5 flex items-start gap-4">
+                        <div class="p-3 rounded-xl ${reward.is_unlocked ? 'bg-neutral-200 text-neutral-500' : 'bg-neutral-100 text-neutral-900'}">
+                            <i data-lucide="gift" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-neutral-900 truncate">${reward.title}</h3>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <i data-lucide="zap" class="w-4 h-4 ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-500 fill-amber-500'}"></i>
+                                <span class="text-sm font-semibold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}">
+                                    ${reward.xp_cost} XP
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${reward.is_unlocked ? `
+                                <span class="flex items-center gap-1 text-green-600 text-sm font-medium">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                    Redeemed
+                                </span>
+                            ` : `
+                                <button onclick="redeemReward('${reward.id}')" ${!canAfford ? 'disabled' : ''}
+                                    class="px-4 py-2 rounded-xl text-sm font-bold transition-all ${canAfford ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'}">
+                                    Redeem
+                                </button>
+                                <button onclick="deleteReward('${reward.id}')" class="p-2 hover:bg-red-50 rounded-lg transition-colors group">
+                                    <i data-lucide="trash-2" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleForm(forceClose = false) {
+            state.formOpen = forceClose ? false : !state.formOpen;
+            if (state.formOpen) {
+                elements.formContainer.classList.remove('hidden-form');
+                elements.formContainer.classList.add('animate-slide-down');
+                elements.toggleBtn.querySelector('span').textContent = 'Close';
+            } else {
+                elements.formContainer.classList.add('hidden-form');
+                elements.formContainer.classList.remove('animate-slide-down');
+                elements.toggleBtn.querySelector('span').textContent = 'New Reward';
+                elements.rewardForm.reset();
+            }
+        }
+
+        function addReward(title, xp) {
+            const newReward = {
+                id: Date.now().toString(),
+                title: title,
+                xp_cost: parseInt(xp),
+                is_unlocked: false
+            };
+            state.rewards.unshift(newReward);
+            toggleForm(true);
+            render();
+        }
+
+        window.addSuggested = addReward;
+
+        window.deleteReward = function(id) {
+            state.rewards = state.rewards.filter(r => r.id !== id);
+            render();
+        };
+
+        window.redeemReward = function(id) {
+            const reward = state.rewards.find(r => r.id === id);
+            if (reward && state.total_xp >= reward.xp_cost) {
+                state.total_xp -= reward.xp_cost;
+                reward.is_unlocked = true;
+                render();
+            }
+        };
+
+        elements.toggleBtn.addEventListener('click', () => toggleForm());
+        document.getElementById('cancelFormBtn').addEventListener('click', () => toggleForm(true));
+        document.getElementById('emptyCta').addEventListener('click', () => toggleForm());
+
+        elements.rewardForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('rewardTitle').value;
+            const xp = document.getElementById('rewardXP').value;
+            addReward(title, xp);
+        });
+
+        elements.filterAvailable.addEventListener('click', () => {
+            state.filter = 'available';
+            elements.filterAvailable.className = 'px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white';
+            elements.filterRedeemed.className = 'px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200';
+            render();
+        });
+
+        elements.filterRedeemed.addEventListener('click', () => {
+            state.filter = 'redeemed';
+            elements.filterRedeemed.className = 'px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white';
+            elements.filterAvailable.className = 'px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200';
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>
