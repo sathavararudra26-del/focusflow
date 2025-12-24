@@ -30,15 +30,15 @@
 </head>
 <body class="bg-neutral-50 text-neutral-900 font-sans antialiased min-h-screen">
 
-    <!-- Desktop Navigation (Direct Implementation of your React code) -->
+    <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
-                    <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
+            <a href="#" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-neutral-900 rounded-lg flex items-center justify-center text-white shadow-sm">
+                    <i data-lucide="zap" class="w-5 h-5 fill-white"></i>
                 </div>
-                <!-- Prominent FocusFlow Name -->
-                <span class="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
+                <!-- Adjusted FocusFlow Typography: Bold but not Extra Bold -->
+                <span class="font-bold text-neutral-900 tracking-tighter text-2xl">FocusFlow</span>
             </a>
 
             <div class="flex items-center gap-1">
@@ -53,7 +53,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
                     <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
-                    <span id="navXP" class="text-xs font-black text-amber-700">0</span>
+                    <span id="navXP" class="text-xs font-black text-amber-700">2,450</span>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
                     <i data-lucide="bell" class="w-4 h-4 text-neutral-400"></i>
@@ -82,13 +82,12 @@
                     <p class="text-neutral-400 text-sm font-medium">Available XP</p>
                     <div class="flex items-center gap-2 mt-1">
                         <i data-lucide="zap" class="w-8 h-8 text-amber-400 fill-amber-400"></i>
-                        <!-- Softened boldness as requested previously -->
-                        <span id="displayXP" class="text-4xl font-bold tracking-tight">0</span>
+                        <span id="displayXP" class="text-4xl font-bold tracking-tight">2,450</span>
                     </div>
                 </div>
                 <div class="text-right">
-                    <p id="totalRedeemedText" class="text-neutral-400 text-sm">0 rewards redeemed</p>
-                    <p id="totalSpentText" class="text-neutral-400 text-sm">0 XP spent</p>
+                    <p id="totalRedeemedText" class="text-neutral-400 text-sm">1 rewards redeemed</p>
+                    <p id="totalSpentText" class="text-neutral-400 text-sm">1,500 XP spent</p>
                 </div>
             </div>
         </div>
@@ -121,10 +120,10 @@
         <!-- Filter Tabs -->
         <div class="flex gap-2 mb-6">
             <button id="filterAvailable" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white">
-                Available (<span id="countAvailable">0</span>)
+                Available (<span id="countAvailable">2</span>)
             </button>
             <button id="filterRedeemed" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
-                Redeemed (<span id="countRedeemed">0</span>)
+                Redeemed (<span id="countRedeemed">1</span>)
             </button>
         </div>
 
@@ -142,7 +141,7 @@
         </div>
     </div>
 
-    <!-- Mobile Navigation Bar (Direct Implementation of your React code) -->
+    <!-- Mobile Navigation -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
         <div class="flex items-center justify-around max-w-md mx-auto">
             <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
@@ -202,15 +201,14 @@
         };
 
         function render() {
-            // Update All XP UI
-            elements.displayXP.textContent = state.total_xp;
-            if (elements.navXP) elements.navXP.textContent = state.total_xp;
+            elements.displayXP.textContent = state.total_xp.toLocaleString();
+            if (elements.navXP) elements.navXP.textContent = state.total_xp.toLocaleString();
 
             const redeemed = state.rewards.filter(r => r.is_unlocked);
             const totalSpent = redeemed.reduce((s, r) => s + r.xp_cost, 0);
             
             elements.totalRedeemed.textContent = `${redeemed.length} rewards redeemed`;
-            elements.totalSpent.textContent = `${totalSpent} XP spent`;
+            elements.totalSpent.textContent = `${totalSpent.toLocaleString()} XP spent`;
             elements.countAvailable.textContent = state.rewards.filter(r => !r.is_unlocked).length;
             elements.countRedeemed.textContent = redeemed.length;
 
@@ -239,7 +237,7 @@
                             <h3 class="font-semibold text-neutral-900 truncate">${reward.title}</h3>
                             <div class="flex items-center gap-1.5 mt-1">
                                 <i data-lucide="zap" class="w-4 h-4 ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-500 fill-amber-500'}"></i>
-                                <span class="text-sm font-semibold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}">${reward.xp_cost} XP</span>
+                                <span class="text-sm font-semibold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}">${reward.xp_cost.toLocaleString()} XP</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
