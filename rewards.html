@@ -3,32 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FocusFlow - Rewards</title>
+    <title>Rewards Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Animations */
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Framer Motion replacements */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
         .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
-        .animate-scale-in { animation: scaleIn 0.2s ease-out forwards; }
+        .animate-form-enter { animation: slideDown 0.3s ease-out forwards; }
+        .reward-card { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         
-        .reward-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .hidden-form { display: none; opacity: 0; transform: translateY(-20px); }
+        .hidden-el {
+            display: none !important;
+        }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e5e5e5; border-radius: 10px; }
-
-        /* Navigation Padding */
-        body { padding-bottom: 80px; }
-        @media (min-width: 1024px) { body { padding-bottom: 0; } }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d4;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a3a3a3;
+        }
     </style>
 </head>
-<body class="bg-neutral-50 text-neutral-900 font-sans antialiased min-h-screen">
+<body class="bg-gray-50 text-neutral-900 min-h-screen pb-24 lg:pb-0">
 
     <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
@@ -40,19 +66,14 @@
                 <span class="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
             </a>
 
-            <div class="flex items-center gap-1">
-                <a href="index.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all bg-neutral-900 text-white">Home</a>
-                <a href="tasks.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">Tasks</a>
-                <a href="analytics.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">Analytics</a>
-                <a href="rewards.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">Rewards</a>
-                <a href="progress.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">Progress</a>
-                <a href="settings.html" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all text-neutral-500 hover:bg-neutral-100">Settings</a>
+            <div id="desktopMenu" class="flex items-center gap-1">
+                <!-- Menu items injected here -->
             </div>
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 rounded-full border border-amber-100">
                     <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500 fill-amber-500"></i>
-                    <span id="nav-xp-counter" class="text-xs font-black text-amber-700">0</span>
+                    <span id="navXPDisplay" class="text-xs font-black text-amber-700">0</span>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-200 transition-colors">
                     <i data-lucide="bell" class="w-4 h-4 text-neutral-400"></i>
@@ -62,253 +83,417 @@
     </nav>
 
     <div class="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        <!-- Header -->
+        <!-- Header Section -->
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight">Rewards</h1>
                 <p class="text-neutral-500 mt-1">Redeem your hard-earned XP.</p>
             </div>
-            <button id="toggleFormBtn" class="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white font-bold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform">
+            <button id="toggleFormBtn" class="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white font-bold rounded-full shadow-lg hover:bg-neutral-800 transition-all active:scale-95">
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 <span class="hidden sm:inline">New Reward</span>
             </button>
         </div>
 
-        <!-- Stats Card -->
+        <!-- XP Dashboard -->
         <div class="animate-slide-up bg-neutral-900 text-white p-6 rounded-3xl mb-8 shadow-xl">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <p class="text-neutral-400 text-sm font-medium">Available XP</p>
                     <div class="flex items-center gap-2 mt-1">
                         <i data-lucide="zap" class="w-8 h-8 text-amber-400 fill-amber-400"></i>
-                        <span id="displayXP" class="text-4xl font-bold tracking-tight">2,450</span>
+                        <span id="availableXPDisplay" class="text-4xl font-extrabold">0</span>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p id="totalRedeemedText" class="text-neutral-400 text-sm">1 rewards redeemed</p>
-                    <p id="totalSpentText" class="text-neutral-400 text-sm">1,500 XP spent</p>
+                <div class="md:text-right border-t md:border-t-0 border-neutral-800 pt-4 md:pt-0">
+                    <p id="totalRedeemedStats" class="text-neutral-400 text-sm">0 rewards redeemed</p>
+                    <p id="totalSpentStats" class="text-neutral-400 text-sm">0 XP spent</p>
                 </div>
             </div>
         </div>
 
-        <!-- Create Reward Form -->
-        <div id="rewardFormContainer" class="hidden-form bg-white border-2 border-dashed border-neutral-200 p-6 rounded-2xl mb-6 transition-all duration-300">
-            <form id="rewardForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-neutral-700">Reward Name</label>
-                        <input id="rewardTitle" type="text" placeholder="e.g. Cinema Night" required
-                            class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-neutral-700">XP Cost</label>
-                        <div class="relative">
-                            <i data-lucide="zap" class="absolute left-3 top-3.5 w-4 h-4 text-neutral-400"></i>
-                            <input id="rewardXP" type="number" placeholder="500" required
-                                class="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10">
+        <!-- Create Reward Form (Initially Hidden) -->
+        <div id="rewardFormWrapper" class="hidden-el mb-6">
+            <div class="animate-form-enter bg-white border-2 border-dashed border-neutral-200 p-6 rounded-2xl">
+                <form id="rewardForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-neutral-700">Reward Name</label>
+                            <input
+                                type="text"
+                                id="formTitle"
+                                placeholder="e.g. 15 min Break"
+                                class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                                required
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-neutral-700">XP Cost</label>
+                            <div class="relative">
+                                <i data-lucide="zap" class="absolute left-3 top-3.5 w-4 h-4 text-neutral-400"></i>
+                                <input
+                                    type="number"
+                                    id="formXPCost"
+                                    placeholder="500"
+                                    class="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" id="cancelFormBtn" class="px-4 py-2 text-neutral-600 hover:bg-neutral-100 rounded-lg font-medium transition-colors">Cancel</button>
-                    <button type="submit" class="px-6 py-2 bg-neutral-900 text-white rounded-lg font-bold hover:bg-neutral-800 transition-colors">Create Reward</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Filter Tabs -->
-        <div class="flex gap-2 mb-6">
-            <button id="filterAvailable" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white">
-                Available (<span id="countAvailable">2</span>)
-            </button>
-            <button id="filterRedeemed" class="px-4 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
-                Redeemed (<span id="countRedeemed">1</span>)
-            </button>
-        </div>
-
-        <!-- Rewards List -->
-        <div id="rewardsList" class="grid gap-4"></div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden bg-white border border-neutral-100 p-12 rounded-3xl text-center">
-            <div class="w-20 h-20 bg-neutral-100 rounded-3xl mx-auto mb-4 flex items-center justify-center">
-                <i data-lucide="gift" class="w-10 h-10 text-neutral-400"></i>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button
+                            type="button"
+                            id="cancelFormBtn"
+                            class="px-4 py-2 text-neutral-600 hover:bg-neutral-100 rounded-lg font-medium transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-6 py-2 bg-neutral-900 text-white rounded-lg font-bold hover:bg-neutral-800 transition-colors"
+                        >
+                            Create Reward
+                        </button>
+                    </div>
+                </form>
             </div>
-            <h3 id="emptyTitle" class="text-xl font-bold text-neutral-900 mb-2">No rewards available</h3>
-            <p id="emptyText" class="text-neutral-500 mb-6">Create custom rewards to stay motivated.</p>
-            <button id="emptyCta" class="px-6 py-3 bg-neutral-900 text-white font-bold rounded-full">Create Reward</button>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+            <button id="filterBtnAvailable" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white shadow-md">
+                Available (<span id="countAvailable">0</span>)
+            </button>
+            <button id="filterBtnRedeemed" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
+                Redeemed (<span id="countRedeemed">0</span>)
+            </button>
+        </div>
+
+        <!-- Rewards List Container -->
+        <div id="rewardsList" class="grid gap-4">
+            <!-- Dynamically injected -->
+        </div>
+
+        <!-- Suggested Rewards -->
+        <div id="suggestionsSection" class="mt-8 hidden-el">
+            <h3 class="font-bold text-neutral-900 mb-4">Suggested Rewards</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <button class="suggestion-btn bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all shadow-sm group" data-title="15 min Break" data-cost="100">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-black">15 min Break</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-bold">100 XP</span>
+                    </div>
+                </button>
+                <button class="suggestion-btn bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all shadow-sm group" data-title="Favorite Snack" data-cost="250">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-black">Favorite Snack</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-bold">250 XP</span>
+                    </div>
+                </button>
+                <button class="suggestion-btn bg-neutral-50 border border-neutral-100 p-4 rounded-2xl text-left hover:border-neutral-200 hover:bg-white transition-all shadow-sm group" data-title="Episode of TV Show" data-cost="500">
+                    <h4 class="font-medium text-neutral-900 group-hover:text-black">Episode of TV Show</h4>
+                    <div class="flex items-center gap-1 mt-1 text-amber-600">
+                        <i data-lucide="zap" class="w-3 h-3"></i>
+                        <span class="text-sm font-bold">500 XP</span>
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Mobile Navigation -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-neutral-100 p-2 lg:hidden">
-        <div class="flex items-center justify-around max-w-md mx-auto">
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
-                <i data-lucide="calendar" class="w-6 h-6"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">home</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
-                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">tasks</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
-                <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">analytics</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-900">
-                <i data-lucide="gift" class="w-6 h-6 scale-110"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">rewards</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
-                <i data-lucide="trending-up" class="w-6 h-6"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">progress</span>
-            </a>
-            <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all text-neutral-400">
-                <i data-lucide="settings" class="w-6 h-6"></i>
-                <span class="text-[10px] font-bold uppercase tracking-tighter">settings</span>
-            </a>
+        <div id="mobileMenu" class="flex items-center justify-around max-w-md mx-auto">
+            <!-- Menu items injected here -->
         </div>
     </div>
 
     <script>
-        // State
-        let state = {
-            total_xp: 2450,
+        // --- Navigation Constants ---
+        const menuItems = [
+            { id: 'Home', icon: 'calendar', label: 'home' },
+            { id: 'Tasks', icon: 'check-circle-2', label: 'tasks' },
+            { id: 'Analytics', icon: 'bar-chart-2', label: 'analytics' },
+            { id: 'Rewards', icon: 'gift', label: 'rewards' },
+            { id: 'Progress', icon: 'trending-up', label: 'progress' },
+            { id: 'Settings', icon: 'settings', label: 'settings' }
+        ];
+
+        const currentPageName = 'Rewards';
+
+        // --- API Client Mock ---
+        const apiMock = {
             rewards: [
-                { id: '1', title: 'Coffee Break', xp_cost: 150, is_unlocked: false },
-                { id: '2', title: '1 Hour Gaming', xp_cost: 600, is_unlocked: false },
-                { id: '3', title: 'Order Pizza', xp_cost: 1500, is_unlocked: true }
+                { id: '1', title: 'Coffee Run', xp_cost: 150, is_unlocked: false },
+                { id: '2', title: 'Video Game Hour', xp_cost: 600, is_unlocked: true }
             ],
-            filter: 'available',
-            formOpen: false
+            userProgress: { total_xp: 1250 },
+            
+            async listRewards() { return this.rewards; },
+            async getProgress() { return this.userProgress; },
+            async createReward(data) {
+                const newReward = { ...data, id: Math.random().toString(36).substr(2, 9), is_unlocked: false };
+                this.rewards.unshift(newReward);
+                return newReward;
+            },
+            async redeemReward(id) {
+                const reward = this.rewards.find(r => r.id === id);
+                if (reward) {
+                    reward.is_unlocked = true;
+                    this.userProgress.total_xp -= reward.xp_cost;
+                }
+            },
+            async deleteReward(id) {
+                this.rewards = this.rewards.filter(r => r.id !== id);
+            }
         };
 
-        const elements = {
-            list: document.getElementById('rewardsList'),
-            displayXP: document.getElementById('displayXP'),
-            navXP: document.getElementById('navXP'),
-            totalRedeemed: document.getElementById('totalRedeemedText'),
-            totalSpent: document.getElementById('totalSpentText'),
-            formContainer: document.getElementById('rewardFormContainer'),
-            toggleBtn: document.getElementById('toggleFormBtn'),
-            rewardForm: document.getElementById('rewardForm'),
-            filterAvailable: document.getElementById('filterAvailable'),
-            filterRedeemed: document.getElementById('filterRedeemed'),
-            countAvailable: document.getElementById('countAvailable'),
-            countRedeemed: document.getElementById('countRedeemed'),
-            emptyState: document.getElementById('emptyState')
-        };
+        // --- App State ---
+        let currentFilter = 'available';
+        let rewardsData = [];
+        let availableXP = 0;
+
+        // --- DOM Elements ---
+        const rewardsList = document.getElementById('rewardsList');
+        const availableXPDisplay = document.getElementById('availableXPDisplay');
+        const navXPDisplay = document.getElementById('navXPDisplay');
+        const rewardFormWrapper = document.getElementById('rewardFormWrapper');
+        const rewardForm = document.getElementById('rewardForm');
+        const filterBtnAvailable = document.getElementById('filterBtnAvailable');
+        const filterBtnRedeemed = document.getElementById('filterBtnRedeemed');
+        const suggestionsSection = document.getElementById('suggestionsSection');
+
+        // --- Initialization ---
+
+        async function init() {
+            renderNavigation();
+            await fetchData();
+            render();
+        }
+
+        function renderNavigation() {
+            const desktopContainer = document.getElementById('desktopMenu');
+            const mobileContainer = document.getElementById('mobileMenu');
+
+            menuItems.forEach(item => {
+                // Desktop
+                const dLink = document.createElement('a');
+                dLink.href = "#";
+                dLink.className = `px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${
+                    currentPageName === item.id ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'
+                }`;
+                dLink.textContent = item.label;
+                desktopContainer.appendChild(dLink);
+
+                // Mobile
+                const mLink = document.createElement('a');
+                mLink.href = "#";
+                mLink.className = `flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${
+                    currentPageName === item.id ? 'text-neutral-900' : 'text-neutral-400'
+                }`;
+                mLink.innerHTML = `
+                    <i data-lucide="${item.icon}" class="w-6 h-6 transition-transform ${currentPageName === item.id ? 'scale-110' : ''}"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">${item.label}</span>
+                `;
+                mobileContainer.appendChild(mLink);
+            });
+            lucide.createIcons();
+        }
+
+        async function fetchData() {
+            rewardsData = await apiMock.listRewards();
+            const progress = await apiMock.getProgress();
+            availableXP = progress.total_xp;
+        }
 
         function render() {
-            elements.displayXP.textContent = state.total_xp.toLocaleString();
-            if (elements.navXP) elements.navXP.textContent = state.total_xp.toLocaleString();
-
-            const redeemed = state.rewards.filter(r => r.is_unlocked);
-            const totalSpent = redeemed.reduce((s, r) => s + r.xp_cost, 0);
+            // Update Stats
+            availableXPDisplay.innerText = availableXP;
+            navXPDisplay.innerText = availableXP;
             
-            elements.totalRedeemed.textContent = `${redeemed.length} rewards redeemed`;
-            elements.totalSpent.textContent = `${totalSpent.toLocaleString()} XP spent`;
-            elements.countAvailable.textContent = state.rewards.filter(r => !r.is_unlocked).length;
-            elements.countRedeemed.textContent = redeemed.length;
+            const redeemedCount = rewardsData.filter(r => r.is_unlocked).length;
+            const availableCount = rewardsData.length - redeemedCount;
+            const spentTotal = rewardsData.filter(r => r.is_unlocked).reduce((sum, r) => sum + r.xp_cost, 0);
 
-            const filtered = state.rewards.filter(r => state.filter === 'redeemed' ? r.is_unlocked : !r.is_unlocked);
+            document.getElementById('countAvailable').innerText = availableCount;
+            document.getElementById('countRedeemed').innerText = redeemedCount;
+            document.getElementById('totalRedeemedStats').innerText = `${redeemedCount} rewards redeemed`;
+            document.getElementById('totalSpentStats').innerText = `${spentTotal} XP spent`;
 
-            if (filtered.length === 0) {
-                elements.list.innerHTML = '';
-                elements.emptyState.classList.remove('hidden');
+            // Filter Buttons UI
+            if (currentFilter === 'available') {
+                filterBtnAvailable.className = 'whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white shadow-md';
+                filterBtnRedeemed.className = 'whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200';
             } else {
-                elements.emptyState.classList.add('hidden');
-                elements.list.innerHTML = filtered.map(reward => createRewardHTML(reward)).join('');
+                filterBtnRedeemed.className = 'whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-900 text-white shadow-md';
+                filterBtnAvailable.className = 'whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all bg-neutral-100 text-neutral-500 hover:bg-neutral-200';
+            }
+
+            // Render List
+            const filtered = rewardsData.filter(r => currentFilter === 'redeemed' ? r.is_unlocked : !r.is_unlocked);
+            
+            if (filtered.length === 0) {
+                renderEmptyState();
+            } else {
+                rewardsList.innerHTML = '';
+                filtered.forEach(reward => {
+                    rewardsList.appendChild(createRewardCard(reward));
+                });
+            }
+
+            // Show suggestions if available list is empty
+            if (availableCount === 0 && currentFilter === 'available') {
+                suggestionsSection.classList.remove('hidden-el');
+            } else {
+                suggestionsSection.classList.add('hidden-el');
             }
 
             lucide.createIcons();
         }
 
-        function createRewardHTML(reward) {
-            const canAfford = state.total_xp >= reward.xp_cost;
-            return `
-                <div class="reward-item animate-scale-in rounded-2xl overflow-hidden shadow-sm bg-white border border-neutral-100 ${reward.is_unlocked ? 'opacity-60' : 'hover:border-neutral-200 hover:shadow-md'}">
-                    <div class="p-5 flex items-start gap-4">
-                        <div class="p-3 rounded-xl ${reward.is_unlocked ? 'bg-neutral-200 text-neutral-500' : 'bg-neutral-100 text-neutral-900'}">
-                            <i data-lucide="gift" class="w-6 h-6"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-neutral-900 truncate">${reward.title}</h3>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <i data-lucide="zap" class="w-4 h-4 ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-500 fill-amber-500'}"></i>
-                                <span class="text-sm font-semibold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}">${reward.xp_cost.toLocaleString()} XP</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            ${reward.is_unlocked ? `
-                                <span class="flex items-center gap-1 text-green-600 text-sm font-medium"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Redeemed</span>
-                            ` : `
-                                <button onclick="redeemReward('${reward.id}')" ${!canAfford ? 'disabled' : ''}
-                                    class="px-4 py-2 rounded-xl text-sm font-bold transition-all ${canAfford ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'}">
-                                    Redeem
-                                </button>
-                                <button onclick="deleteReward('${reward.id}')" class="p-2 hover:bg-red-50 rounded-lg group transition-colors">
-                                    <i data-lucide="trash-2" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
-                                </button>
-                            `}
+        function createRewardCard(reward) {
+            const canAfford = availableXP >= reward.xp_cost;
+            const card = document.createElement('div');
+            card.className = `reward-card bg-white border border-neutral-100 rounded-2xl shadow-sm overflow-hidden transition-all ${reward.is_unlocked ? 'opacity-60' : 'hover:border-neutral-200 hover:shadow-md'}`;
+            
+            card.innerHTML = `
+                <div class="p-5 flex items-start gap-4">
+                    <div class="p-3 rounded-xl ${reward.is_unlocked ? 'bg-neutral-200 text-neutral-500' : 'bg-neutral-100 text-neutral-900'}">
+                        <i data-lucide="gift" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-neutral-900 truncate">${reward.title}</h3>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <i data-lucide="zap" class="w-4 h-4 ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-500 fill-amber-500'}"></i>
+                            <span class="text-sm font-bold ${reward.is_unlocked ? 'text-neutral-400' : 'text-amber-700'}">
+                                ${reward.xp_cost} XP
+                            </span>
                         </div>
                     </div>
+                    <div class="flex items-center gap-2">
+                        ${reward.is_unlocked ? `
+                            <span class="flex items-center gap-1 text-green-600 text-sm font-medium">
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                Redeemed
+                            </span>
+                        ` : `
+                            <button 
+                                onclick="handleRedeem('${reward.id}')"
+                                ${!canAfford ? 'disabled' : ''} 
+                                class="px-4 py-2 rounded-xl text-sm font-bold transition-all ${canAfford ? 'bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95' : 'bg-neutral-100 text-neutral-400 cursor-not-allowed'}"
+                            >
+                                Redeem
+                            </button>
+                            <button onclick="handleDelete('${reward.id}')" class="p-2 hover:bg-red-50 rounded-lg group transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                            </button>
+                        `}
+                    </div>
+                </div>
+                ${!reward.is_unlocked && !canAfford ? `
+                    <div class="px-5 pb-4">
+                        <p class="text-xs text-red-500 flex items-center gap-1">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                            Need ${reward.xp_cost - availableXP} more XP
+                        </p>
+                    </div>
+                ` : ''}
+            `;
+            return card;
+        }
+
+        function renderEmptyState() {
+            rewardsList.innerHTML = `
+                <div class="bg-white border border-neutral-100 p-12 rounded-3xl text-center animate-slide-up">
+                    <div class="w-20 h-20 bg-neutral-100 rounded-3xl mx-auto mb-4 flex items-center justify-center">
+                        <i data-lucide="gift" class="w-10 h-10 text-neutral-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neutral-900 mb-2">
+                        ${currentFilter === 'redeemed' ? 'No redeemed rewards yet' : 'No rewards available'}
+                    </h3>
+                    <p class="text-neutral-500 mb-6 max-w-xs mx-auto">
+                        ${currentFilter === 'redeemed' 
+                            ? 'Complete tasks to earn XP and redeem rewards!' 
+                            : 'Create custom rewards to motivate yourself.'}
+                    </p>
+                    ${currentFilter === 'available' ? `
+                        <button onclick="toggleForm(true)" class="px-6 py-3 bg-neutral-900 text-white font-bold rounded-full hover:bg-neutral-800 transition-all active:scale-95">
+                            Create Reward
+                        </button>
+                    ` : ''}
                 </div>
             `;
         }
 
-        function toggleForm(forceClose = false) {
-            state.formOpen = forceClose ? false : !state.formOpen;
-            if (state.formOpen) {
-                elements.formContainer.classList.remove('hidden-form');
-                elements.formContainer.classList.add('animate-slide-down');
-                elements.toggleBtn.querySelector('span').textContent = 'Close';
+        // --- Event Handlers ---
+
+        function toggleForm(show) {
+            if (show) {
+                rewardFormWrapper.classList.remove('hidden-el');
+                document.getElementById('formTitle').focus();
             } else {
-                elements.formContainer.classList.add('hidden-form');
-                elements.toggleBtn.querySelector('span').textContent = 'New Reward';
-                elements.rewardForm.reset();
+                rewardFormWrapper.classList.add('hidden-el');
+                rewardForm.reset();
             }
         }
 
-        window.redeemReward = function(id) {
-            const reward = state.rewards.find(r => r.id === id);
-            if (reward && state.total_xp >= reward.xp_cost) {
-                state.total_xp -= reward.xp_cost;
-                reward.is_unlocked = true;
-                render();
-            }
-        };
-
-        window.deleteReward = function(id) {
-            state.rewards = state.rewards.filter(r => r.id !== id);
+        async function handleRedeem(id) {
+            await apiMock.redeemReward(id);
+            await fetchData();
             render();
-        };
+        }
 
-        elements.rewardForm.addEventListener('submit', (e) => {
+        async function handleDelete(id) {
+            await apiMock.deleteReward(id);
+            await fetchData();
+            render();
+        }
+
+        async function handleCreate(title, cost) {
+            await apiMock.createReward({ title, xp_cost: parseInt(cost) });
+            await fetchData();
+            toggleForm(false);
+            render();
+        }
+
+        // --- Listeners ---
+
+        document.getElementById('toggleFormBtn').addEventListener('click', () => {
+            const isHidden = rewardFormWrapper.classList.contains('hidden-el');
+            toggleForm(isHidden);
+        });
+
+        document.getElementById('cancelFormBtn').addEventListener('click', () => toggleForm(false));
+
+        rewardForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            state.rewards.unshift({
-                id: Date.now().toString(),
-                title: document.getElementById('rewardTitle').value,
-                xp_cost: parseInt(document.getElementById('rewardXP').value),
-                is_unlocked: false
-            });
-            toggleForm(true);
+            const title = document.getElementById('formTitle').value;
+            const cost = document.getElementById('formXPCost').value;
+            await handleCreate(title, cost);
+        });
+
+        filterBtnAvailable.addEventListener('click', () => {
+            currentFilter = 'available';
             render();
         });
 
-        elements.toggleBtn.addEventListener('click', () => toggleForm());
-        document.getElementById('cancelFormBtn').addEventListener('click', () => toggleForm(true));
-
-        elements.filterAvailable.addEventListener('click', () => { state.filter = 'available'; updateFilterUI(); });
-        elements.filterRedeemed.addEventListener('click', () => { state.filter = 'redeemed'; updateFilterUI(); });
-
-        function updateFilterUI() {
-            elements.filterAvailable.className = `px-4 py-2 rounded-full text-sm font-bold transition-all ${state.filter === 'available' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'}`;
-            elements.filterRedeemed.className = `px-4 py-2 rounded-full text-sm font-bold transition-all ${state.filter === 'redeemed' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'}`;
+        filterBtnRedeemed.addEventListener('click', () => {
+            currentFilter = 'redeemed';
             render();
-        }
+        });
 
-        render();
+        document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const title = btn.getAttribute('data-title');
+                const cost = btn.getAttribute('data-cost');
+                await handleCreate(title, cost);
+            });
+        });
+
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
