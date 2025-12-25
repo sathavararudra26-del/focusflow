@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication | FocusFlow</title>
+    <title>Login | FocusFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -24,31 +24,13 @@
             outline: none;
         }
 
-        .input-field.error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-        }
-
-        .split-layout {
-            min-height: 100vh;
-        }
-
-        .auth-card {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .auth-card.active {
-            display: block;
-        }
-
-        .strength-bar {
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
         }
 
         @media (min-width: 1024px) {
@@ -60,20 +42,20 @@
 </head>
 <body class="bg-white text-neutral-900">
 
-    <div class="flex flex-col lg:flex-row split-layout">
+    <div class="flex flex-col lg:flex-row min-h-screen">
         
-        <!-- Left Section: Value & Motivation -->
+        <!-- Left Section: Shared Sidebar -->
         <section class="side-visual lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between border-r border-neutral-100">
             <div>
                 <div class="flex items-center gap-2 mb-16">
-                    <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center cursor-pointer">
+                    <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
                         <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
                     </div>
                     <span class="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
                 </div>
 
                 <div class="max-w-md">
-                    <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">Master your <br/>daily flow</h1>
+                    <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-neutral-900">Master your <br/>daily flow</h1>
                     <p class="text-lg text-neutral-500 mb-10">The ultimate system to turn tasks into progress.</p>
 
                     <ul class="space-y-6 mb-12">
@@ -91,13 +73,6 @@
                                 <p class="text-neutral-500 text-sm">Visual feedback to keep you consistent.</p>
                             </div>
                         </li>
-                        <li class="flex items-start gap-4">
-                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="bar-chart-3" class="text-neutral-900 w-5 h-5"></i></div>
-                            <div>
-                                <p class="font-semibold text-neutral-900">Track progress with analytics</p>
-                                <p class="text-neutral-500 text-sm">Understand your productivity trends.</p>
-                            </div>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -109,64 +84,18 @@
             </div>
         </section>
 
-        <!-- Right Section: Forms -->
+        <!-- Right Section: Login Form -->
         <main class="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-neutral-50/50">
-            <div class="w-full max-w-md">
+            <div class="w-full max-w-md fade-in">
                 
-                <!-- Error Message Alert (Hidden by default) -->
                 <div id="formError" class="hidden mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600">
                     <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
                     <p id="errorText" class="text-sm font-medium"></p>
                 </div>
 
-                <!-- SIGN UP CARD -->
-                <div id="signUpCard" class="auth-card active bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
-                    <h2 class="text-2xl font-extrabold mb-6">Create Account</h2>
-                    <form id="signUpForm" onsubmit="handleAuth(event, 'Sign Up')" class="space-y-4" novalidate>
-                        <div class="space-y-1.5">
-                            <label class="text-sm font-semibold text-neutral-700 ml-1">Full Name</label>
-                            <input type="text" id="regName" required placeholder="Enter your name" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-sm font-semibold text-neutral-700 ml-1">Email Address</label>
-                            <input type="email" id="regEmail" required placeholder="name@example.com" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-sm font-semibold text-neutral-700 ml-1">Password</label>
-                            <input type="password" id="signUpPassword" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                            
-                            <div class="px-1 pt-2">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Security Strength</span>
-                                    <span id="strengthLabel" class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Waiting...</span>
-                                </div>
-                                <div class="w-full h-1 bg-neutral-100 rounded-full overflow-hidden">
-                                    <div id="strengthBar" class="strength-bar h-full w-0 bg-neutral-200"></div>
-                                </div>
-                                <p id="passwordTip" class="text-[10px] text-neutral-400 mt-1.5 leading-tight">Use at least 8 characters with numbers and symbols.</p>
-                            </div>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-sm font-semibold text-neutral-700 ml-1">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98]">
-                                Create Account
-                            </button>
-                            <p class="text-center text-xs text-neutral-400 mt-4">Free to start. No credit card required.</p>
-                        </div>
-                    </form>
-                    <p class="text-center mt-8 text-sm text-neutral-500">
-                        Already have an account? 
-                        <button onclick="toggleAuth('login')" class="text-neutral-900 font-bold hover:underline">Log in</button>
-                    </p>
-                </div>
-
-                <!-- LOGIN CARD -->
-                <div id="loginCard" class="auth-card bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
+                <div class="bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
                     <h2 class="text-2xl font-extrabold mb-6">Welcome Back</h2>
-                    <form id="loginForm" onsubmit="handleAuth(event, 'Login')" class="space-y-5" novalidate>
+                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5" novalidate>
                         <div class="space-y-1.5">
                             <label class="text-sm font-semibold text-neutral-700 ml-1">Email Address</label>
                             <input type="email" id="loginEmail" required placeholder="name@example.com" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
@@ -186,123 +115,41 @@
                     </form>
                     <p class="text-center mt-8 text-sm text-neutral-500">
                         New to FocusFlow? 
-                        <button onclick="toggleAuth('signup')" class="text-neutral-900 font-bold hover:underline">Create an account</button>
+                        <a href="signup.html" class="text-neutral-900 font-bold hover:underline">Create an account</a>
                     </p>
                 </div>
-
-                <p class="text-center text-[10px] text-neutral-400 mt-8 leading-relaxed max-w-[280px] mx-auto">
-                    By accessing FocusFlow, you agree to our <a href="#" class="underline">Terms</a> and <a href="#" class="underline">Privacy Policy</a>.
-                </p>
             </div>
         </main>
     </div>
 
     <script>
-        const passwordInput = document.getElementById('signUpPassword');
-        const confirmInput = document.getElementById('confirmPassword');
-        const strengthBar = document.getElementById('strengthBar');
-        const strengthLabel = document.getElementById('strengthLabel');
-        const passwordTip = document.getElementById('passwordTip');
         const errorBox = document.getElementById('formError');
         const errorText = document.getElementById('errorText');
 
         function showError(msg) {
             errorText.innerText = msg;
             errorBox.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function hideError() {
-            errorBox.classList.add('hidden');
-        }
-
-        // Email Validation Regex
         const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-        // Password Strength
-        passwordInput.addEventListener('input', () => {
-            const val = passwordInput.value;
-            let score = 0;
-            if (!val) { updateUI(0, "Waiting...", "neutral-200", "Use at least 8 characters."); return; }
-            if (val.length >= 8) score++;
-            if (/[0-9]/.test(val)) score++;
-            if (/[^A-Za-z0-9]/.test(val)) score++;
-            if (val.length >= 12) score++;
-
-            switch (score) {
-                case 1: updateUI(25, "Weak", "red-500", "Keep going! Add numbers."); break;
-                case 2: updateUI(50, "Fair", "amber-500", "Good. Add symbols."); break;
-                case 3: updateUI(75, "Strong", "emerald-500", "Very secure."); break;
-                case 4: updateUI(100, "Excellent", "emerald-600", "Maximum security."); break;
-                default: updateUI(10, "Very Weak", "red-400", "Too short.");
-            }
-        });
-
-        function updateUI(percent, label, colorClass, tip) {
-            strengthBar.style.width = `${percent}%`;
-            strengthBar.className = `strength-bar h-full transition-all duration-300 bg-${colorClass}`;
-            strengthLabel.innerText = label;
-            strengthLabel.className = `text-[10px] font-bold uppercase tracking-wider text-${colorClass}`;
-            passwordTip.innerText = tip;
-        }
-
-        function toggleAuth(view) {
-            hideError();
-            const signup = document.getElementById('signUpCard');
-            const login = document.getElementById('loginCard');
-            if (view === 'login') {
-                signup.classList.remove('active');
-                login.classList.add('active');
-            } else {
-                login.classList.remove('active');
-                signup.classList.add('active');
-            }
-        }
-
-        function handleAuth(event, type) {
+        function handleLogin(event) {
             event.preventDefault();
-            hideError();
-
-            const email = type === 'Login' ? document.getElementById('loginEmail').value : document.getElementById('regEmail').value;
+            errorBox.classList.add('hidden');
             
-            // 1. Email Check
-            if (!isValidEmail(email)) {
-                showError("Please enter a valid email address.");
-                return;
-            }
+            const email = document.getElementById('loginEmail').value;
+            if (!isValidEmail(email)) { showError("Please enter a valid email."); return; }
 
-            // 2. Password Match Check (Sign Up Only)
-            if (type === 'Sign Up') {
-                const pass = passwordInput.value;
-                const confirm = confirmInput.value;
-                if (pass !== confirm) {
-                    showError("Passwords do not match. Please check and try again.");
-                    return;
-                }
-                if (pass.length < 8) {
-                    showError("Password must be at least 8 characters long.");
-                    return;
-                }
-            }
-
-            // Submit Simulation
             const btn = event.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerText;
+            btn.innerText = "Signing in...";
             btn.disabled = true;
-            btn.innerText = type === 'Login' ? "Verifying..." : "Creating...";
-            btn.classList.add('opacity-80', 'cursor-not-allowed');
-
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerText = originalText;
-                btn.classList.remove('opacity-80', 'cursor-not-allowed');
-                console.log(`${type} Success Simulation`);
+            setTimeout(() => { 
+                btn.innerText = "Success!"; 
+                console.log("Logged In");
             }, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        });
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
     </script>
 </body>
 </html>
