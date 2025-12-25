@@ -1,321 +1,338 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { base44 } from '@/api/base44Client';
-import Icon from '../components/shared/Icon';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Turn Tasks Into Epic Wins</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons for clean, safe visual elements -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
 
-const features = [
-  {
-    icon: 'Target',
-    title: 'Task Management',
-    description: 'Create and organize tasks with difficulty levels, categories, and due dates.'
-  },
-  {
-    icon: 'Zap',
-    title: 'Earn XP',
-    description: 'Complete tasks to earn experience points and level up your productivity.'
-  },
-  {
-    icon: 'Trophy',
-    title: 'Level System',
-    description: 'Track your progress with a dynamic leveling system that grows with you.'
-  },
-  {
-    icon: 'Flame',
-    title: 'Daily Streaks',
-    description: 'Build consistency with streak tracking and unlock achievements.'
-  },
-  {
-    icon: 'Gift',
-    title: 'Rewards',
-    description: 'Redeem your XP for custom rewards and celebrate your wins.'
-  },
-  {
-    icon: 'BarChart2',
-    title: 'Analytics',
-    description: 'Visualize your productivity trends with detailed analytics and heatmaps.'
-  }
-];
+        /* Animation class for scrolling into view */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
-const stats = [
-  { value: '10,000+', label: 'Tasks Completed' },
-  { value: '500+', label: 'Active Users' },
-  { value: '98%', label: 'Satisfaction' },
-  { value: '24/7', label: 'Available' }
-];
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-export default function Landing() {
-  const handleGetStarted = () => {
-    base44.auth.redirectToLogin();
-  };
+        .gradient-text {
+            background: linear-gradient(to right, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
-              <Icon name="Zap" className="w-4 h-4 text-white fill-white" />
+        /* Hover effect for buttons */
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-white text-neutral-900">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
+                    <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
+                </div>
+                <span class="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
             </div>
-            <span className="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => base44.auth.redirectToLogin()}
-              className="px-4 py-2 text-neutral-600 hover:text-neutral-900 font-medium transition-colors"
-            >
-              Login
-            </button>
-            <button
-              onClick={handleGetStarted}
-              className="px-6 py-2 bg-neutral-900 text-white rounded-full font-bold hover:bg-neutral-800 transition-colors"
-            >
-              Sign Up
-            </button>
-          </div>
+            <div class="flex items-center gap-3">
+                <button onclick="handleLogin()" class="px-4 py-2 text-neutral-600 hover:text-neutral-900 font-medium transition-colors">
+                    Login
+                </button>
+                <button onclick="handleSignUp()" class="px-6 py-2 bg-neutral-900 text-white rounded-full font-bold hover:bg-neutral-800 transition-colors btn-primary">
+                    Sign Up
+                </button>
+            </div>
         </div>
-      </nav>
+    </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full mb-6">
-              <Icon name="Zap" className="w-4 h-4 text-amber-500 fill-amber-500" />
-              <span className="text-sm font-bold text-amber-700">Gamified Productivity</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 mb-6">
-              Turn Tasks Into
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">
-                Epic Wins
-              </span>
-            </h1>
-            
-            <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
-              FocusFlow transforms your productivity into an engaging game. Complete tasks, earn XP, 
-              level up, and unlock rewards while building unstoppable momentum.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={handleGetStarted}
-                className="w-full sm:w-auto px-8 py-4 bg-neutral-900 text-white rounded-full font-bold text-lg hover:bg-neutral-800 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
-              >
-                Start Free Today
-              </button>
-              <button className="w-full sm:w-auto px-8 py-4 border-2 border-neutral-200 text-neutral-900 rounded-full font-bold text-lg hover:border-neutral-900 transition-all">
-                Watch Demo
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Hero Visual */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-16 relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-200/20 to-orange-200/20 rounded-3xl blur-3xl" />
-            <div className="relative bg-neutral-900 rounded-3xl p-8 shadow-2xl">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-white/10 backdrop-blur p-6 rounded-2xl">
-                  <div className="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center mb-3">
-                    <Icon name="Zap" className="w-6 h-6 text-neutral-900" />
-                  </div>
-                  <h3 className="text-white font-bold text-lg mb-1">2,450 XP</h3>
-                  <p className="text-neutral-400 text-sm">Total Earned</p>
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full mb-6">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-500 fill-current"></i>
+                    <span class="text-sm font-bold text-amber-700">Gamified Productivity</span>
                 </div>
                 
-                <div className="bg-white/10 backdrop-blur p-6 rounded-2xl">
-                  <div className="w-12 h-12 bg-indigo-400 rounded-xl flex items-center justify-center mb-3">
-                    <Icon name="Trophy" className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-white font-bold text-lg mb-1">Level 5</h3>
-                  <p className="text-neutral-400 text-sm">Rising Star</p>
-                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 mb-6 leading-[1.1]">
+                    Turn Tasks Into
+                    <span class="block gradient-text">Epic Wins</span>
+                </h1>
                 
-                <div className="bg-white/10 backdrop-blur p-6 rounded-2xl">
-                  <div className="w-12 h-12 bg-orange-400 rounded-xl flex items-center justify-center mb-3">
-                    <Icon name="Flame" className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-white font-bold text-lg mb-1">12 Days</h3>
-                  <p className="text-neutral-400 text-sm">Current Streak</p>
+                <p class="text-xl text-neutral-600 mb-8 leading-relaxed">
+                    FocusFlow transforms your daily learning and tasks into an engaging quest. Earn XP, 
+                    level up, and build great habits while having fun.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="handleSignUp()" class="w-full sm:w-auto px-8 py-4 bg-neutral-900 text-white rounded-full font-bold text-lg hover:bg-neutral-800 transition-all shadow-xl hover:shadow-2xl btn-primary">
+                        Start Free Today
+                    </button>
+                    <button class="w-full sm:w-auto px-8 py-4 border-2 border-neutral-200 text-neutral-900 rounded-full font-bold text-lg hover:border-neutral-900 transition-all">
+                        Watch Demo
+                    </button>
                 </div>
-              </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Stats Section */}
-      <section className="py-16 px-6 bg-neutral-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <h3 className="text-4xl font-extrabold text-neutral-900 mb-2">{stat.value}</h3>
-                <p className="text-neutral-600 font-medium">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
-              Everything You Need to Win
-            </h2>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-              Powerful features designed to keep you motivated and productive every single day.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white border border-neutral-100 p-8 rounded-2xl hover:border-neutral-200 hover:shadow-lg transition-all"
-              >
-                <div className="w-14 h-14 bg-neutral-900 rounded-xl flex items-center justify-center mb-4">
-                  <Icon name={feature.icon} className="w-7 h-7 text-white" />
+            <!-- Dashboard Preview Visual -->
+            <div class="reveal mt-16 relative" style="transition-delay: 200ms;">
+                <div class="absolute inset-0 bg-gradient-to-r from-amber-200/20 to-orange-200/20 rounded-3xl blur-3xl"></div>
+                <div class="relative bg-neutral-900 rounded-3xl p-8 shadow-2xl">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                            <div class="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center mb-3">
+                                <i data-lucide="zap" class="w-6 h-6 text-neutral-900"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-lg mb-1">2,450 XP</h3>
+                            <p class="text-neutral-400 text-sm">Total Earned</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                            <div class="w-12 h-12 bg-indigo-400 rounded-xl flex items-center justify-center mb-3">
+                                <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-lg mb-1">Level 5</h3>
+                            <p class="text-neutral-400 text-sm">Rising Star</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                            <div class="w-12 h-12 bg-orange-400 rounded-xl flex items-center justify-center mb-3">
+                                <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-lg mb-1">12 Days</h3>
+                            <p class="text-neutral-400 text-sm">Current Streak</p>
+                        </div>
+                    </div>
                 </div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-2">{feature.title}</h3>
-                <p className="text-neutral-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
+            </div>
         </div>
-      </section>
+    </section>
 
-      {/* How It Works */}
-      <section className="py-20 px-6 bg-neutral-50">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-neutral-600">Three simple steps to productivity mastery</p>
-          </motion.div>
+    <!-- Stats Section -->
+    <section class="py-16 px-6 bg-neutral-50">
+        <div class="max-w-6xl mx-auto">
+            <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <!-- Stats injected via JavaScript -->
+            </div>
+        </div>
+    </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: '1',
-                title: 'Create Tasks',
-                description: 'Add tasks with difficulty levels, categories, and deadlines. Each task has an XP value.',
-                icon: 'Plus'
-              },
-              {
-                step: '2',
-                title: 'Complete & Earn',
-                description: 'Focus on your tasks and mark them complete. Earn XP, level up, and build streaks.',
-                icon: 'CheckCircle2'
-              },
-              {
-                step: '3',
-                title: 'Unlock Rewards',
-                description: 'Redeem your XP for custom rewards. Track your progress and celebrate wins.',
-                icon: 'Gift'
-              }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.15 }}
-                className="relative"
-              >
-                <div className="bg-white border border-neutral-100 p-8 rounded-2xl shadow-sm">
-                  <div className="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center mb-4">
-                    <Icon name={item.icon} className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-5xl font-black text-neutral-100 absolute top-4 right-8">
-                    {item.step}
-                  </div>
-                  <h3 className="text-2xl font-bold text-neutral-900 mb-3">{item.title}</h3>
-                  <p className="text-neutral-600">{item.description}</p>
+    <!-- Features Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
+                    Features to Help You Win
+                </h2>
+                <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
+                    Designed to keep you motivated and organized every step of the way.
+                </p>
+            </div>
+
+            <div id="features-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Features injected via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 px-6 bg-neutral-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="reveal text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
+                    How It Works
+                </h2>
+                <p class="text-xl text-neutral-600">Three simple steps to productivity mastery</p>
+            </div>
+
+            <div id="steps-grid" class="grid md:grid-cols-3 gap-8">
+                <!-- Steps injected via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="reveal bg-neutral-900 rounded-3xl p-12 text-center text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"></div>
+                <div class="relative">
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+                        Ready to Level Up?
+                    </h2>
+                    <p class="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
+                        Join other students and achievers who've made their daily goals a rewarding game.
+                    </p>
+                    <button onclick="handleSignUp()" class="px-8 py-4 bg-amber-400 text-neutral-900 rounded-full font-bold text-lg hover:bg-amber-300 transition-all shadow-xl hover:shadow-2xl btn-primary">
+                        Get Started — It's Free
+                    </button>
+                    <p class="text-sm text-neutral-400 mt-4">Start your journey in 30 seconds</p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+            </div>
         </div>
-      </section>
+    </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-neutral-900 rounded-3xl p-12 text-center text-white relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl" />
-            <div className="relative">
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-                Ready to Level Up?
-              </h2>
-              <p className="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
-                Join thousands of users who've transformed their productivity into a rewarding game.
-              </p>
-              <button
-                onClick={handleGetStarted}
-                className="px-8 py-4 bg-amber-400 text-neutral-900 rounded-full font-bold text-lg hover:bg-amber-300 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
-              >
-                Get Started — It's Free
-              </button>
-              <p className="text-sm text-neutral-400 mt-4">No credit card required • Start in 30 seconds</p>
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-neutral-100">
+        <div class="max-w-6xl mx-auto text-center md:text-left">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
+                        <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
+                    </div>
+                    <span class="font-bold text-neutral-900 text-xl">FocusFlow</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-neutral-600">
+                    <a href="#" class="hover:text-neutral-900 transition-colors">About</a>
+                    <a href="#" class="hover:text-neutral-900 transition-colors">Features</a>
+                    <a href="#" class="hover:text-neutral-900 transition-colors">Community</a>
+                    <a href="#" class="hover:text-neutral-900 transition-colors">Privacy</a>
+                </div>
+                <p class="text-sm text-neutral-500">© 2024 FocusFlow. Build for growth.</p>
             </div>
-          </motion.div>
         </div>
-      </section>
+    </footer>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-neutral-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
-                <Icon name="Zap" className="w-4 h-4 text-white fill-white" />
-              </div>
-              <span className="font-bold text-neutral-900 text-xl">FocusFlow</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-neutral-600">
-              <button className="hover:text-neutral-900 transition-colors">About</button>
-              <button className="hover:text-neutral-900 transition-colors">Features</button>
-              <button className="hover:text-neutral-900 transition-colors">Privacy</button>
-              <button className="hover:text-neutral-900 transition-colors">Terms</button>
-            </div>
-            <p className="text-sm text-neutral-500">© 2024 FocusFlow. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+    <script>
+        /**
+         * FocusFlow Website Logic
+         * Using Vanilla JavaScript for maximum compatibility.
+         */
+
+        // Data Models
+        const features = [
+            { icon: 'target', title: 'Goal Setting', description: 'Set clear goals with difficulty levels and categories for your studies or hobbies.' },
+            { icon: 'zap', title: 'Earn XP', description: 'Complete your daily tasks to earn experience points and level up your skills.' },
+            { icon: 'trophy', title: 'Level Up', description: 'Watch your progress grow with a fun leveling system that rewards your hard work.' },
+            { icon: 'flame', title: 'Streaks', description: 'Stay consistent with streak tracking. How many days in a row can you go?' },
+            { icon: 'gift', title: 'Rewards', description: 'Unlock special badges and achievements as you reach new milestones.' },
+            { icon: 'bar-chart-2', title: 'Analytics', description: 'See how much you have accomplished with simple, helpful progress charts.' }
+        ];
+
+        const stats = [
+            { value: '10,000+', label: 'Wins Logged' },
+            { value: '500+', label: 'Active Users' },
+            { value: '100%', label: 'Safe & Clean' },
+            { value: '24/7', label: 'Availability' }
+        ];
+
+        const steps = [
+            { step: '1', title: 'Add Tasks', description: 'List your daily tasks. Give each one an XP value based on how challenging it is.', icon: 'plus' },
+            { step: '2', title: 'Do Your Best', description: 'Focus on your work. When you finish, check the task off and earn your XP.', icon: 'check-circle-2' },
+            { step: '3', title: 'Celebrate', description: 'Level up your profile and unlock rewards for your consistency and effort.', icon: 'gift' }
+        ];
+
+        // Interaction Handlers
+        function handleLogin() {
+            // Placeholder for login logic - keeping it safe and simple
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            console.log("Navigation to Login requested.");
+        }
+
+        function handleSignUp() {
+            // Placeholder for signup logic
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            console.log("Navigation to Sign Up requested.");
+        }
+
+        /**
+         * Core Initialization Function
+         * This runs once the window has fully loaded.
+         */
+        function initializeWebsite() {
+            const statsGrid = document.getElementById('stats-grid');
+            const featuresGrid = document.getElementById('features-grid');
+            const stepsGrid = document.getElementById('steps-grid');
+
+            // 1. Render Stats
+            stats.forEach((stat, i) => {
+                const div = document.createElement('div');
+                div.className = 'reveal text-center';
+                div.style.transitionDelay = `${i * 100}ms`;
+                div.innerHTML = `
+                    <h3 class="text-4xl font-extrabold text-neutral-900 mb-2">${stat.value}</h3>
+                    <p class="text-neutral-600 font-medium">${stat.label}</p>
+                `;
+                statsGrid.appendChild(div);
+            });
+
+            // 2. Render Features
+            features.forEach((feature, i) => {
+                const div = document.createElement('div');
+                div.className = 'reveal bg-white border border-neutral-100 p-8 rounded-2xl hover:border-neutral-200 hover:shadow-lg transition-all group';
+                div.style.transitionDelay = `${i * 100}ms`;
+                div.innerHTML = `
+                    <div class="w-14 h-14 bg-neutral-900 rounded-xl flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                        <i data-lucide="${feature.icon}" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-neutral-900 mb-2">${feature.title}</h3>
+                    <p class="text-neutral-600">${feature.description}</p>
+                `;
+                featuresGrid.appendChild(div);
+            });
+
+            // 3. Render How-To Steps
+            steps.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'reveal relative';
+                div.style.transitionDelay = `${i * 150}ms`;
+                div.innerHTML = `
+                    <div class="bg-white border border-neutral-100 p-8 rounded-2xl shadow-sm h-full flex flex-col">
+                        <div class="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center mb-4">
+                            <i data-lucide="${item.icon}" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <div class="text-5xl font-black text-neutral-100 absolute top-4 right-8 select-none">
+                            ${item.step}
+                        </div>
+                        <h3 class="text-2xl font-bold text-neutral-900 mb-3">${item.title}</h3>
+                        <p class="text-neutral-600">${item.description}</p>
+                    </div>
+                `;
+                stepsGrid.appendChild(div);
+            });
+
+            // 4. Initialize Lucide Icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            // 5. Setup Scroll Animation (Intersection Observer)
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all elements with the 'reveal' class
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // Wait for DOM to be ready
+        window.onload = initializeWebsite;
+    </script>
+</body>
+</html>
