@@ -35,159 +35,162 @@
         }
 
         /* Hover effect for buttons */
-        .btn-primary:active {
+        .btn-hover:active {
             transform: scale(0.95);
         }
     </style>
 </head>
-<body class="bg-white text-neutral-900">
+<body class="bg-white text-neutral-900 overflow-x-hidden">
 
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <a href="index.html" class="flex items-center gap-2 cursor-pointer">
                 <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
                     <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
                 </div>
                 <span class="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
-            </div>
+            </a>
             <div class="flex items-center gap-3">
-                <button onclick="handleLogin()" class="px-4 py-2 text-neutral-600 hover:text-neutral-900 font-medium transition-colors">
+                <a href="login.html" class="px-4 py-2 text-neutral-600 hover:text-neutral-900 font-medium transition-colors">
                     Login
-                </button>
-                <button onclick="handleSignUp()" class="px-6 py-2 bg-neutral-900 text-white rounded-full font-bold hover:bg-neutral-800 transition-colors btn-primary">
+                </a>
+                <a href="signup.html" class="px-6 py-2 bg-neutral-900 text-white rounded-full font-bold hover:bg-neutral-800 transition-colors btn-hover text-center">
                     Sign Up
-                </button>
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="reveal text-center max-w-3xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full mb-6">
-                    <i data-lucide="zap" class="w-4 h-4 text-amber-500 fill-current"></i>
-                    <span class="text-sm font-bold text-amber-700">Gamified Productivity</span>
+    <!-- Main Content Area -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="pt-32 pb-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="reveal text-center max-w-3xl mx-auto">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-full mb-6">
+                        <i data-lucide="zap" class="w-4 h-4 text-amber-500 fill-current"></i>
+                        <span class="text-sm font-bold text-amber-700">Gamified Productivity</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 mb-6 leading-[1.1]">
+                        Turn Tasks Into
+                        <span class="block gradient-text">Epic Wins</span>
+                    </h1>
+                    
+                    <p class="text-xl text-neutral-600 mb-8 leading-relaxed">
+                        FocusFlow transforms your daily learning and tasks into an engaging quest. Earn XP, 
+                        level up, and build great habits while having fun.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="signup.html" class="w-full sm:w-auto px-8 py-4 bg-neutral-900 text-white rounded-full font-bold text-lg hover:bg-neutral-800 transition-all shadow-xl hover:shadow-2xl btn-hover text-center">
+                            Start Free Today
+                        </a>
+                        <button class="w-full sm:w-auto px-8 py-4 border-2 border-neutral-200 text-neutral-900 rounded-full font-bold text-lg hover:border-neutral-900 transition-all">
+                            Watch Demo
+                        </button>
+                    </div>
                 </div>
-                
-                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-neutral-900 mb-6 leading-[1.1]">
-                    Turn Tasks Into
-                    <span class="block gradient-text">Epic Wins</span>
-                </h1>
-                
-                <p class="text-xl text-neutral-600 mb-8 leading-relaxed">
-                    FocusFlow transforms your daily learning and tasks into an engaging quest. Earn XP, 
-                    level up, and build great habits while having fun.
-                </p>
-                
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button onclick="handleSignUp()" class="w-full sm:w-auto px-8 py-4 bg-neutral-900 text-white rounded-full font-bold text-lg hover:bg-neutral-800 transition-all shadow-xl hover:shadow-2xl btn-primary">
-                        Start Free Today
-                    </button>
-                    <button class="w-full sm:w-auto px-8 py-4 border-2 border-neutral-200 text-neutral-900 rounded-full font-bold text-lg hover:border-neutral-900 transition-all">
-                        Watch Demo
-                    </button>
-                </div>
-            </div>
 
-            <!-- Dashboard Preview Visual -->
-            <div class="reveal mt-16 relative" style="transition-delay: 200ms;">
-                <div class="absolute inset-0 bg-gradient-to-r from-amber-200/20 to-orange-200/20 rounded-3xl blur-3xl"></div>
-                <div class="relative bg-neutral-900 rounded-3xl p-8 shadow-2xl">
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
-                            <div class="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center mb-3">
-                                <i data-lucide="zap" class="w-6 h-6 text-neutral-900"></i>
+                <!-- Dashboard Preview Visual -->
+                <div class="reveal mt-16 relative" style="transition-delay: 200ms;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-amber-200/20 to-orange-200/20 rounded-3xl blur-3xl"></div>
+                    <div class="relative bg-neutral-900 rounded-3xl p-8 shadow-2xl">
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                                <div class="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center mb-3">
+                                    <i data-lucide="zap" class="w-6 h-6 text-neutral-900"></i>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-1">2,450 XP</h3>
+                                <p class="text-neutral-400 text-sm">Total Earned</p>
                             </div>
-                            <h3 class="text-white font-bold text-lg mb-1">2,450 XP</h3>
-                            <p class="text-neutral-400 text-sm">Total Earned</p>
-                        </div>
-                        
-                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
-                            <div class="w-12 h-12 bg-indigo-400 rounded-xl flex items-center justify-center mb-3">
-                                <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
+                            
+                            <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                                <div class="w-12 h-12 bg-indigo-400 rounded-xl flex items-center justify-center mb-3">
+                                    <i data-lucide="trophy" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-1">Level 5</h3>
+                                <p class="text-neutral-400 text-sm">Rising Star</p>
                             </div>
-                            <h3 class="text-white font-bold text-lg mb-1">Level 5</h3>
-                            <p class="text-neutral-400 text-sm">Rising Star</p>
-                        </div>
-                        
-                        <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
-                            <div class="w-12 h-12 bg-orange-400 rounded-xl flex items-center justify-center mb-3">
-                                <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+                            
+                            <div class="bg-white/10 backdrop-blur p-6 rounded-2xl border border-white/5">
+                                <div class="w-12 h-12 bg-orange-400 rounded-xl flex items-center justify-center mb-3">
+                                    <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <h3 class="text-white font-bold text-lg mb-1">12 Days</h3>
+                                <p class="text-neutral-400 text-sm">Current Streak</p>
                             </div>
-                            <h3 class="text-white font-bold text-lg mb-1">12 Days</h3>
-                            <p class="text-neutral-400 text-sm">Current Streak</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Stats Section -->
-    <section class="py-16 px-6 bg-neutral-50">
-        <div class="max-w-6xl mx-auto">
-            <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <!-- Stats injected via JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="reveal text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
-                    Features to Help You Win
-                </h2>
-                <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
-                    Designed to keep you motivated and organized every step of the way.
-                </p>
-            </div>
-
-            <div id="features-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Features injected via JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="py-20 px-6 bg-neutral-50">
-        <div class="max-w-6xl mx-auto">
-            <div class="reveal text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
-                    How It Works
-                </h2>
-                <p class="text-xl text-neutral-600">Three simple steps to productivity mastery</p>
-            </div>
-
-            <div id="steps-grid" class="grid md:grid-cols-3 gap-8">
-                <!-- Steps injected via JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-4xl mx-auto">
-            <div class="reveal bg-neutral-900 rounded-3xl p-12 text-center text-white relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"></div>
-                <div class="relative">
-                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
-                        Ready to Level Up?
-                    </h2>
-                    <p class="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
-                        Join other students and achievers who've made their daily goals a rewarding game.
-                    </p>
-                    <button onclick="handleSignUp()" class="px-8 py-4 bg-amber-400 text-neutral-900 rounded-full font-bold text-lg hover:bg-amber-300 transition-all shadow-xl hover:shadow-2xl btn-primary">
-                        Get Started — It's Free
-                    </button>
-                    <p class="text-sm text-neutral-400 mt-4">Start your journey in 30 seconds</p>
+        <!-- Stats Section -->
+        <section class="py-16 px-6 bg-neutral-50">
+            <div class="max-w-6xl mx-auto">
+                <div id="stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <!-- Stats injected via JavaScript -->
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="reveal text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
+                        Features to Help You Win
+                    </h2>
+                    <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
+                        Designed to keep you motivated and organized every step of the way.
+                    </p>
+                </div>
+
+                <div id="features-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Features injected via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="py-20 px-6 bg-neutral-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="reveal text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4">
+                        How It Works
+                    </h2>
+                    <p class="text-xl text-neutral-600">Three simple steps to productivity mastery</p>
+                </div>
+
+                <div id="steps-grid" class="grid md:grid-cols-3 gap-8">
+                    <!-- Steps injected via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="reveal bg-neutral-900 rounded-3xl p-12 text-center text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"></div>
+                    <div class="relative">
+                        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+                            Ready to Level Up?
+                        </h2>
+                        <p class="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
+                            Join other students and achievers who've made their daily goals a rewarding game.
+                        </p>
+                        <a href="signup.html" class="inline-block px-8 py-4 bg-amber-400 text-neutral-900 rounded-full font-bold text-lg hover:bg-amber-300 transition-all shadow-xl hover:shadow-2xl btn-hover">
+                            Get Started — It's Free
+                        </a>
+                        <p class="text-sm text-neutral-400 mt-4">Start your journey in 30 seconds</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="py-12 px-6 border-t border-neutral-100">
@@ -213,10 +216,8 @@
     <script>
         /**
          * FocusFlow Website Logic
-         * Using Vanilla JavaScript for maximum compatibility.
          */
 
-        // Data Models
         const features = [
             { icon: 'target', title: 'Goal Setting', description: 'Set clear goals with difficulty levels and categories for your studies or hobbies.' },
             { icon: 'zap', title: 'Earn XP', description: 'Complete your daily tasks to earn experience points and level up your skills.' },
@@ -239,81 +240,65 @@
             { step: '3', title: 'Celebrate', description: 'Level up your profile and unlock rewards for your consistency and effort.', icon: 'gift' }
         ];
 
-        // Interaction Handlers
-        function handleLogin() {
-            // Placeholder for login logic - keeping it safe and simple
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            console.log("Navigation to Login requested.");
-        }
-
-        function handleSignUp() {
-            // Placeholder for signup logic
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            console.log("Navigation to Sign Up requested.");
-        }
-
-        /**
-         * Core Initialization Function
-         * This runs once the window has fully loaded.
-         */
         function initializeWebsite() {
             const statsGrid = document.getElementById('stats-grid');
             const featuresGrid = document.getElementById('features-grid');
             const stepsGrid = document.getElementById('steps-grid');
 
-            // 1. Render Stats
-            stats.forEach((stat, i) => {
-                const div = document.createElement('div');
-                div.className = 'reveal text-center';
-                div.style.transitionDelay = `${i * 100}ms`;
-                div.innerHTML = `
-                    <h3 class="text-4xl font-extrabold text-neutral-900 mb-2">${stat.value}</h3>
-                    <p class="text-neutral-600 font-medium">${stat.label}</p>
-                `;
-                statsGrid.appendChild(div);
-            });
+            if (statsGrid) {
+                stats.forEach((stat, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'reveal text-center';
+                    div.style.transitionDelay = `${i * 100}ms`;
+                    div.innerHTML = `
+                        <h3 class="text-4xl font-extrabold text-neutral-900 mb-2">${stat.value}</h3>
+                        <p class="text-neutral-600 font-medium">${stat.label}</p>
+                    `;
+                    statsGrid.appendChild(div);
+                });
+            }
 
-            // 2. Render Features
-            features.forEach((feature, i) => {
-                const div = document.createElement('div');
-                div.className = 'reveal bg-white border border-neutral-100 p-8 rounded-2xl hover:border-neutral-200 hover:shadow-lg transition-all group';
-                div.style.transitionDelay = `${i * 100}ms`;
-                div.innerHTML = `
-                    <div class="w-14 h-14 bg-neutral-900 rounded-xl flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-                        <i data-lucide="${feature.icon}" class="w-7 h-7 text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-neutral-900 mb-2">${feature.title}</h3>
-                    <p class="text-neutral-600">${feature.description}</p>
-                `;
-                featuresGrid.appendChild(div);
-            });
-
-            // 3. Render How-To Steps
-            steps.forEach((item, i) => {
-                const div = document.createElement('div');
-                div.className = 'reveal relative';
-                div.style.transitionDelay = `${i * 150}ms`;
-                div.innerHTML = `
-                    <div class="bg-white border border-neutral-100 p-8 rounded-2xl shadow-sm h-full flex flex-col">
-                        <div class="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center mb-4">
-                            <i data-lucide="${item.icon}" class="w-8 h-8 text-white"></i>
+            if (featuresGrid) {
+                features.forEach((feature, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'reveal bg-white border border-neutral-100 p-8 rounded-2xl hover:border-neutral-200 hover:shadow-lg transition-all group';
+                    div.style.transitionDelay = `${i * 100}ms`;
+                    div.innerHTML = `
+                        <div class="w-14 h-14 bg-neutral-900 rounded-xl flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="${feature.icon}" class="w-7 h-7 text-white"></i>
                         </div>
-                        <div class="text-5xl font-black text-neutral-100 absolute top-4 right-8 select-none">
-                            ${item.step}
-                        </div>
-                        <h3 class="text-2xl font-bold text-neutral-900 mb-3">${item.title}</h3>
-                        <p class="text-neutral-600">${item.description}</p>
-                    </div>
-                `;
-                stepsGrid.appendChild(div);
-            });
+                        <h3 class="text-xl font-bold text-neutral-900 mb-2">${feature.title}</h3>
+                        <p class="text-neutral-600">${feature.description}</p>
+                    `;
+                    featuresGrid.appendChild(div);
+                });
+            }
 
-            // 4. Initialize Lucide Icons
+            if (stepsGrid) {
+                steps.forEach((item, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'reveal relative';
+                    div.style.transitionDelay = `${i * 150}ms`;
+                    div.innerHTML = `
+                        <div class="bg-white border border-neutral-100 p-8 rounded-2xl shadow-sm h-full flex flex-col">
+                            <div class="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center mb-4">
+                                <i data-lucide="${item.icon}" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <div class="text-5xl font-black text-neutral-100 absolute top-4 right-8 select-none">
+                                ${item.step}
+                            </div>
+                            <h3 class="text-2xl font-bold text-neutral-900 mb-3">${item.title}</h3>
+                            <p class="text-neutral-600">${item.description}</p>
+                        </div>
+                    `;
+                    stepsGrid.appendChild(div);
+                });
+            }
+
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
 
-            // 5. Setup Scroll Animation (Intersection Observer)
             const observerOptions = {
                 threshold: 0.15,
                 rootMargin: '0px 0px -50px 0px'
@@ -327,11 +312,9 @@
                 });
             }, observerOptions);
 
-            // Observe all elements with the 'reveal' class
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }
 
-        // Wait for DOM to be ready
         window.onload = initializeWebsite;
     </script>
 </body>
