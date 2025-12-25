@@ -44,7 +44,7 @@
     <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-2">
+            <a href="index.html" class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
                     <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
                 </div>
@@ -190,14 +190,16 @@
                 
                 // Desktop Link
                 const dLink = document.createElement('a');
-                dLink.href = "#";
+                // FIXED: Set href from item data instead of "#"
+                dLink.href = item.href; 
                 dLink.className = `px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${isActive ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'}`;
                 dLink.innerText = item.label;
                 desktop.appendChild(dLink);
 
                 // Mobile Link
                 const mLink = document.createElement('a');
-                mLink.href = "#";
+                // FIXED: Set href from item data instead of "#"
+                mLink.href = item.href;
                 mLink.className = `flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${isActive ? 'text-neutral-900' : 'text-neutral-400'}`;
                 mLink.innerHTML = `
                     <i data-lucide="${item.icon}" class="w-6 h-6 transition-transform ${isActive ? 'scale-110' : ''}"></i>
@@ -289,7 +291,10 @@
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     currentPeriod = e.target.dataset.period;
-                    document.querySelectorAll('.period-btn').forEach(b => b.classList.replace('bg-white', 'text-neutral-500'));
+                    document.querySelectorAll('.period-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-neutral-900', 'shadow-sm');
+                        b.classList.add('text-neutral-500');
+                    });
                     e.target.classList.replace('text-neutral-500', 'bg-white');
                     e.target.classList.add('text-neutral-900', 'shadow-sm');
                     renderAnalytics();
