@@ -6,6 +6,8 @@
     <title>Login | FocusFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Import Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
@@ -24,10 +26,6 @@
             outline: none;
         }
 
-        .split-layout {
-            min-height: 100vh;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -37,132 +35,122 @@
             animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @media (min-width: 1024px) {
-            .side-visual {
-                background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-            }
-        }
-
         /* Checkbox custom style */
         .custom-checkbox {
-            width: 1.2rem;
-            height: 1.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
             accent-color: #171717;
             cursor: pointer;
         }
     </style>
 </head>
-<body class="bg-white text-neutral-900">
+<body class="bg-white text-neutral-900 min-h-screen flex items-center justify-center">
 
-    <div class="flex flex-col lg:flex-row split-layout">
+    <!-- Container to constrain the width and center everything -->
+    <div class="w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 p-6 lg:p-12">
         
         <!-- Left Section: Branding & Social Proof -->
-        <section class="side-visual lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between border-r border-neutral-100">
-            <div>
-                <div class="flex items-center gap-2 mb-16">
-                    <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
-                        <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
-                    </div>
-                    <span class="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
+        <section class="w-full lg:w-1/2 max-w-md">
+            <div class="flex items-center gap-2 mb-12">
+                <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center">
+                    <i data-lucide="zap" class="w-4 h-4 text-white fill-current"></i>
                 </div>
-
-                <div class="max-w-md">
-                    <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">Welcome back to <br/>your flow.</h1>
-                    <p class="text-lg text-neutral-500 mb-10">Sign in to pick up exactly where you left off.</p>
-
-                    <ul class="space-y-6 mb-12">
-                        <li class="flex items-start gap-4">
-                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="check-circle" class="text-neutral-900 w-5 h-5"></i></div>
-                            <div>
-                                <p class="font-semibold text-neutral-900">Sync across all devices</p>
-                                <p class="text-neutral-500 text-sm">Your tasks and streaks stay updated everywhere.</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="shield-check" class="text-neutral-900 w-5 h-5"></i></div>
-                            <div>
-                                <p class="font-semibold text-neutral-900">Secure, private workspace</p>
-                                <p class="text-neutral-500 text-sm">Enterprise-grade encryption for your data.</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                <span class="font-bold text-neutral-900 text-xl tracking-tight">FocusFlow</span>
             </div>
 
-            <div class="grid grid-cols-3 gap-4 border-t border-neutral-100 pt-8 max-w-sm">
-                <div><p class="text-xs uppercase tracking-widest text-neutral-400 font-bold mb-1">XP Earned</p><p class="text-xl font-bold">1.2M+</p></div>
-                <div><p class="text-xs uppercase tracking-widest text-neutral-400 font-bold mb-1">Avg Streak</p><p class="text-xl font-bold">14d</p></div>
-                <div><p class="text-xs uppercase tracking-widest text-neutral-400 font-bold mb-1">Levels</p><p class="text-2xl font-bold leading-none">&infin;</p></div>
+            <div class="mb-10">
+                <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 leading-tight">Welcome back to <br/>your flow.</h1>
+                <p class="text-lg text-neutral-500">Sign in to pick up exactly where you left off.</p>
+            </div>
+
+            <ul class="space-y-6 mb-12">
+                <li class="flex items-start gap-4">
+                    <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="check-circle" class="text-neutral-900 w-5 h-5"></i></div>
+                    <div>
+                        <p class="font-semibold text-neutral-900">Sync across all devices</p>
+                        <p class="text-neutral-500 text-sm">Your tasks and streaks stay updated everywhere.</p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-4">
+                    <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="shield-check" class="text-neutral-900 w-5 h-5"></i></div>
+                    <div>
+                        <p class="font-semibold text-neutral-900">Secure, private workspace</p>
+                        <p class="text-neutral-500 text-sm">Enterprise-grade encryption for your data.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="grid grid-cols-3 gap-4 border-t border-neutral-100 pt-8">
+                <div><p class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold mb-1">XP Earned</p><p class="text-xl font-bold">1.2M+</p></div>
+                <div><p class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold mb-1">Avg Streak</p><p class="text-xl font-bold">14d</p></div>
+                <div><p class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold mb-1">Levels</p><p class="text-2xl font-bold leading-none">&infin;</p></div>
             </div>
         </section>
 
         <!-- Right Section: Login Form -->
-        <main class="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-neutral-50/50">
-            <div class="w-full max-w-md">
-                
-                <!-- Error Message Alert -->
-                <div id="formError" class="hidden mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600">
-                    <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
-                    <p id="errorText" class="text-sm font-medium"></p>
+        <main class="w-full lg:w-1/2 max-w-md">
+            <!-- Error Message Alert -->
+            <div id="formError" class="hidden mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600">
+                <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+                <p id="errorText" class="text-sm font-medium"></p>
+            </div>
+
+            <!-- LOGIN CARD -->
+            <div id="loginCard" class="auth-card bg-white p-8 lg:p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-neutral-100">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-extrabold text-neutral-900">Sign In</h2>
+                    <p class="text-sm text-neutral-500 mt-1">Enter your details to access your dashboard.</p>
                 </div>
 
-                <!-- LOGIN CARD -->
-                <div id="loginCard" class="auth-card bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
-                    <div class="mb-8">
-                        <h2 class="text-2xl font-extrabold text-neutral-900">Sign In</h2>
-                        <p class="text-sm text-neutral-500 mt-1">Enter your details to access your dashboard.</p>
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5" novalidate>
+                    <div class="space-y-1.5">
+                        <label class="text-sm font-semibold text-neutral-700 ml-1">Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="name@example.com" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
                     </div>
 
-                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5" novalidate>
-                        
-                        <!-- Email Field -->
-                        <div class="space-y-1.5">
-                            <label class="text-sm font-semibold text-neutral-700 ml-1">Email Address</label>
-                            <input type="email" id="loginEmail" required placeholder="name@example.com" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center ml-1">
+                            <label class="text-sm font-semibold text-neutral-700">Password</label>
+                            <button type="button" onclick="showForgotPassword()" class="text-xs font-semibold text-neutral-400 hover:text-neutral-900 transition-colors">Forgot password?</button>
                         </div>
-
-                        <!-- Password Field -->
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between items-center ml-1">
-                                <label class="text-sm font-semibold text-neutral-700">Password</label>
-                                <a href="#" onclick="showForgotPassword()" class="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors">Forgot password?</a>
-                            </div>
-                            <div class="relative">
-                                <input type="password" id="loginPassword" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors">
-                                    <i data-lucide="eye" id="passwordIcon" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Remember Me -->
-                        <div class="flex items-center gap-2 ml-1">
-                            <input type="checkbox" id="rememberMe" class="custom-checkbox rounded">
-                            <label for="rememberMe" class="text-sm font-medium text-neutral-600 cursor-pointer select-none">Stay signed in for 30 days</label>
-                        </div>
-
-                        <!-- Submit Section -->
-                        <div class="pt-2">
-                            <button type="submit" id="submitBtn" class="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
-                                <span>Sign In</span>
-                                <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <div class="relative">
+                            <input type="password" id="loginPassword" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+                            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors">
+                                <i data-lucide="eye" id="passwordIcon" class="w-5 h-5"></i>
                             </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
 
-                <!-- Footer Links -->
-                <div class="text-center mt-8">
-                    <p class="text-sm text-neutral-500">
-                        New to FocusFlow? 
-                        <a href="#" class="font-bold text-neutral-900 hover:underline ml-1">Create an account</a>
-                    </p>
-                </div>
+                    <div class="flex items-center gap-2 ml-1">
+                        <input type="checkbox" id="rememberMe" class="custom-checkbox rounded">
+                        <label for="rememberMe" class="text-xs font-medium text-neutral-500 cursor-pointer select-none">Stay signed in for 30 days</label>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="submitBtn" class="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
+                            <span>Sign In</span>
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer Links -->
+            <div class="text-center mt-8">
+                <p class="text-sm text-neutral-500">
+                    New to FocusFlow? 
+                    <a href="#" class="font-bold text-neutral-900 hover:underline ml-1">Create an account</a>
+                </p>
             </div>
         </main>
     </div>
 
     <script>
+        // Initialize Supabase Client
+        const supabaseUrl = 'https://ynkqrlbujswhlrqsvejy.supabase.co';
+        const supabaseKey = 'sb_publishable_0d4eOTaUYDPKuUemHyy8Xg_w3N9Ss9c';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
         // DOM Elements
         const errorBox = document.getElementById('formError');
         const errorText = document.getElementById('errorText');
@@ -194,17 +182,24 @@
 
         const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-        function showForgotPassword() {
+        async function showForgotPassword() {
             const email = document.getElementById('loginEmail').value;
             if(!email) {
                 showError("Please enter your email address first.");
                 return;
             }
-            alert(`A password reset link has been sent to ${email}`);
+            
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                if (error) throw error;
+                showError("A password reset link has been sent to " + email);
+            } catch (err) {
+                showError(err.message || "Could not send reset link.");
+            }
         }
 
         // Form Submission Logic
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             hideError();
 
@@ -225,13 +220,21 @@
                 </svg>
                 <span>Signing In...</span>
             `;
-            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
 
-            // Simulate Network Request
-            setTimeout(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalHTML;
-                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+            try {
+                // Actual Supabase Sign In
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) {
+                    // Specific error handling for wrong credentials
+                    if (error.status === 400 || error.message.toLowerCase().includes('invalid login credentials')) {
+                        throw new Error("Please check your email and password.");
+                    }
+                    throw error;
+                }
                 
                 // Success feedback
                 const card = document.getElementById('loginCard');
@@ -249,10 +252,16 @@
                 `;
                 lucide.createIcons();
                 
+                // Success redirect simulation
                 setTimeout(() => {
                    window.location.reload(); 
                 }, 1200);
-            }, 1500);
+
+            } catch (err) {
+                showError(err.message || "An unexpected error occurred. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
         }
 
         // Initialize Lucide Icons
