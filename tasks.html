@@ -58,12 +58,12 @@
     <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('Home')">
+            <a href="index.html" class="flex items-center gap-2 cursor-pointer">
                 <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
                     <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
                 </div>
                 <span class="font-bold text-neutral-900 tracking-tight text-xl">FocusFlow</span>
-            </div>
+            </a>
 
             <div class="flex items-center gap-1" id="desktop-menu">
                 <!-- Menu items injected here -->
@@ -228,18 +228,29 @@
             mobile.innerHTML = '';
 
             menuItems.forEach(item => {
-                // Desktop
-                const dLink = document.createElement('button');
                 const isActive = currentPage === item.id;
+
+                // Desktop <a> links
+                const dLink = document.createElement('a');
+                dLink.href = item.href;
                 dLink.className = `px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${isActive ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'}`;
                 dLink.innerText = item.label;
-                dLink.onclick = () => navigateTo(item.id);
+                
+                // Prevent real navigation if it's the current "page logic" for this demo
+                dLink.onclick = (e) => {
+                    e.preventDefault();
+                    navigateTo(item.id);
+                };
                 desktop.appendChild(dLink);
 
-                // Mobile
-                const mLink = document.createElement('button');
+                // Mobile <a> links
+                const mLink = document.createElement('a');
+                mLink.href = item.href;
                 mLink.className = `flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${isActive ? 'text-neutral-900' : 'text-neutral-400'}`;
-                mLink.onclick = () => navigateTo(item.id);
+                mLink.onclick = (e) => {
+                    e.preventDefault();
+                    navigateTo(item.id);
+                };
                 mLink.innerHTML = `
                     <i data-lucide="${item.icon}" class="w-6 h-6 transition-transform ${isActive ? 'scale-110' : ''}"></i>
                     <span class="text-[10px] font-bold uppercase tracking-tighter">${item.label}</span>
@@ -476,4 +487,3 @@
     </script>
 </body>
 </html>
-
