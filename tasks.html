@@ -236,10 +236,12 @@
                 dLink.className = `px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${isActive ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'}`;
                 dLink.innerText = item.label;
                 
-                // Prevent real navigation if it's the current "page logic" for this demo
+                // Allow view switching for the demo without reloading
                 dLink.onclick = (e) => {
-                    e.preventDefault();
-                    navigateTo(item.id);
+                    if(item.href === '#') {
+                        e.preventDefault();
+                        navigateTo(item.id);
+                    }
                 };
                 desktop.appendChild(dLink);
 
@@ -248,8 +250,10 @@
                 mLink.href = item.href;
                 mLink.className = `flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${isActive ? 'text-neutral-900' : 'text-neutral-400'}`;
                 mLink.onclick = (e) => {
-                    e.preventDefault();
-                    navigateTo(item.id);
+                    if(item.href === '#') {
+                        e.preventDefault();
+                        navigateTo(item.id);
+                    }
                 };
                 mLink.innerHTML = `
                     <i data-lucide="${item.icon}" class="w-6 h-6 transition-transform ${isActive ? 'scale-110' : ''}"></i>
