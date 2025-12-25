@@ -24,13 +24,17 @@
             outline: none;
         }
 
+        .split-layout {
+            min-height: 100vh;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
+        .auth-card {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @media (min-width: 1024px) {
@@ -38,13 +42,21 @@
                 background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
             }
         }
+
+        /* Checkbox custom style */
+        .custom-checkbox {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #171717;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-white text-neutral-900">
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
+    <div class="flex flex-col lg:flex-row split-layout">
         
-        <!-- Left Section: Shared Sidebar -->
+        <!-- Left Section: Branding & Social Proof -->
         <section class="side-visual lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between border-r border-neutral-100">
             <div>
                 <div class="flex items-center gap-2 mb-16">
@@ -55,22 +67,22 @@
                 </div>
 
                 <div class="max-w-md">
-                    <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-neutral-900">Master your <br/>daily flow</h1>
-                    <p class="text-lg text-neutral-500 mb-10">The ultimate system to turn tasks into progress.</p>
+                    <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">Welcome back to <br/>your flow.</h1>
+                    <p class="text-lg text-neutral-500 mb-10">Sign in to pick up exactly where you left off.</p>
 
                     <ul class="space-y-6 mb-12">
                         <li class="flex items-start gap-4">
-                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="circle-dot" class="text-neutral-900 w-5 h-5"></i></div>
+                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="check-circle" class="text-neutral-900 w-5 h-5"></i></div>
                             <div>
-                                <p class="font-semibold text-neutral-900">Earn XP for completed tasks</p>
-                                <p class="text-neutral-500 text-sm">Quantify your growth in real-time.</p>
+                                <p class="font-semibold text-neutral-900">Sync across all devices</p>
+                                <p class="text-neutral-500 text-sm">Your tasks and streaks stay updated everywhere.</p>
                             </div>
                         </li>
                         <li class="flex items-start gap-4">
-                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="trending-up" class="text-neutral-900 w-5 h-5"></i></div>
+                            <div class="mt-1 w-5 h-5 flex items-center justify-center"><i data-lucide="shield-check" class="text-neutral-900 w-5 h-5"></i></div>
                             <div>
-                                <p class="font-semibold text-neutral-900">Build streaks and momentum</p>
-                                <p class="text-neutral-500 text-sm">Visual feedback to keep you consistent.</p>
+                                <p class="font-semibold text-neutral-900">Secure, private workspace</p>
+                                <p class="text-neutral-500 text-sm">Enterprise-grade encryption for your data.</p>
                             </div>
                         </li>
                     </ul>
@@ -86,36 +98,64 @@
 
         <!-- Right Section: Login Form -->
         <main class="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-neutral-50/50">
-            <div class="w-full max-w-md fade-in">
+            <div class="w-full max-w-md">
                 
+                <!-- Error Message Alert -->
                 <div id="formError" class="hidden mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600">
                     <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
                     <p id="errorText" class="text-sm font-medium"></p>
                 </div>
 
-                <div class="bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
-                    <h2 class="text-2xl font-extrabold mb-6">Welcome Back</h2>
+                <!-- LOGIN CARD -->
+                <div id="loginCard" class="auth-card bg-white p-8 lg:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-extrabold text-neutral-900">Sign In</h2>
+                        <p class="text-sm text-neutral-500 mt-1">Enter your details to access your dashboard.</p>
+                    </div>
+
                     <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5" novalidate>
+                        
+                        <!-- Email Field -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-semibold text-neutral-700 ml-1">Email Address</label>
                             <input type="email" id="loginEmail" required placeholder="name@example.com" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
                         </div>
+
+                        <!-- Password Field -->
                         <div class="space-y-1.5">
-                            <div class="flex justify-between items-center px-1">
+                            <div class="flex justify-between items-center ml-1">
                                 <label class="text-sm font-semibold text-neutral-700">Password</label>
-                                <a href="#" class="text-xs text-neutral-400 hover:text-neutral-900">Forgot?</a>
+                                <a href="#" onclick="showForgotPassword()" class="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors">Forgot password?</a>
                             </div>
-                            <input type="password" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+                            <div class="relative">
+                                <input type="password" id="loginPassword" required placeholder="••••••••" class="input-field w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+                                <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors">
+                                    <i data-lucide="eye" id="passwordIcon" class="w-5 h-5"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="pt-4">
-                            <button type="submit" class="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98]">
-                                Sign In
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center gap-2 ml-1">
+                            <input type="checkbox" id="rememberMe" class="custom-checkbox rounded">
+                            <label for="rememberMe" class="text-sm font-medium text-neutral-600 cursor-pointer select-none">Stay signed in for 30 days</label>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="pt-2">
+                            <button type="submit" id="submitBtn" class="w-full bg-neutral-900 text-white font-bold py-4 rounded-xl hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98] flex items-center justify-center gap-2">
+                                <span>Sign In</span>
+                                <i data-lucide="log-in" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </form>
-                    <p class="text-center mt-8 text-sm text-neutral-500">
+                </div>
+
+                <!-- Footer Links -->
+                <div class="text-center mt-8">
+                    <p class="text-sm text-neutral-500">
                         New to FocusFlow? 
-                        <a href="signup.html" class="text-neutral-900 font-bold hover:underline">Create an account</a>
+                        <a href="#" class="font-bold text-neutral-900 hover:underline ml-1">Create an account</a>
                     </p>
                 </div>
             </div>
@@ -123,33 +163,108 @@
     </div>
 
     <script>
+        // DOM Elements
         const errorBox = document.getElementById('formError');
         const errorText = document.getElementById('errorText');
+        const submitBtn = document.getElementById('submitBtn');
+        const passwordInput = document.getElementById('loginPassword');
+        const passwordIcon = document.getElementById('passwordIcon');
 
+        // Helper Functions
         function showError(msg) {
             errorText.innerText = msg;
             errorBox.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideError() {
+            errorBox.classList.add('hidden');
+        }
+
+        function togglePassword() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
         }
 
         const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-        function handleLogin(event) {
-            event.preventDefault();
-            errorBox.classList.add('hidden');
-            
+        function showForgotPassword() {
             const email = document.getElementById('loginEmail').value;
-            if (!isValidEmail(email)) { showError("Please enter a valid email."); return; }
-
-            const btn = event.target.querySelector('button[type="submit"]');
-            btn.innerText = "Signing in...";
-            btn.disabled = true;
-            setTimeout(() => { 
-                btn.innerText = "Success!"; 
-                console.log("Logged In");
-            }, 1000);
+            if(!email) {
+                showError("Please enter your email address first.");
+                return;
+            }
+            alert(`A password reset link has been sent to ${email}`);
         }
 
-        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
+        // Form Submission Logic
+        function handleLogin(event) {
+            event.preventDefault();
+            hideError();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = passwordInput.value;
+
+            // Basic Validation
+            if (!isValidEmail(email)) return showError("Please enter a valid email address.");
+            if (!password) return showError("Please enter your password.");
+
+            // UI Loading State
+            submitBtn.disabled = true;
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Signing In...</span>
+            `;
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            // Simulate Network Request
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                
+                // Success feedback
+                const card = document.getElementById('loginCard');
+                card.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-neutral-900 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="check" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-2">Authenticated!</h2>
+                        <p class="text-neutral-500 mb-8">Success. Preparing your daily flow...</p>
+                        <div class="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-neutral-900 h-full animate-[progress_1s_ease-in-out]"></div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                   window.location.reload(); 
+                }, 1200);
+            }, 1500);
+        }
+
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
     </script>
+    <style>
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+    </style>
 </body>
 </html>
