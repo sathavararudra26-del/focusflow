@@ -59,7 +59,7 @@
     <!-- Desktop Navigation -->
     <nav class="sticky top-0 z-50 w-full border-b border-neutral-100 bg-white/80 backdrop-blur-md hidden lg:block">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-2">
+            <a href="/" class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center text-white">
                     <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
                 </div>
@@ -186,13 +186,14 @@
     <script>
         const currentPageName = 'Settings';
 
+        // Updated MENU_ITEMS to include href paths
         const MENU_ITEMS = [
-            { id: 'Home', icon: 'calendar', label: 'home' },
-            { id: 'Tasks', icon: 'check-circle-2', label: 'tasks' },
-            { id: 'Analytics', icon: 'bar-chart-2', label: 'analytics' },
-            { id: 'Rewards', icon: 'gift', label: 'rewards' },
-            { id: 'Progress', icon: 'trending-up', label: 'progress' },
-            { id: 'Settings', icon: 'settings', label: 'settings' }
+            { id: 'Home', icon: 'calendar', label: 'home', href: '/index' },
+            { id: 'Tasks', icon: 'check-circle-2', label: 'tasks', href: '/tasks' },
+            { id: 'Analytics', icon: 'bar-chart-2', label: 'analytics', href: '/analytics' },
+            { id: 'Rewards', icon: 'gift', label: 'rewards', href: '/rewards' },
+            { id: 'Progress', icon: 'trending-up', label: 'progress', href: '/progress' },
+            { id: 'Settings', icon: 'settings', label: 'settings', href: '/settings' }
         ];
 
         const PRO_FEATURES = [
@@ -253,7 +254,7 @@
             desktopMenu.innerHTML = MENU_ITEMS.map(item => {
                 const isActive = currentPageName === item.id;
                 return `
-                    <a href="#" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${
+                    <a href="${item.href}" class="px-4 py-2 rounded-full text-sm font-bold capitalize transition-all ${
                         isActive ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'
                     }">
                         ${item.label}
@@ -264,7 +265,7 @@
             mobileMenu.innerHTML = MENU_ITEMS.map(item => {
                 const isActive = currentPageName === item.id;
                 return `
-                    <a href="#" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${
+                    <a href="${item.href}" class="flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${
                         isActive ? 'text-neutral-900' : 'text-neutral-400'
                     }">
                         <i data-lucide="${item.icon}" class="w-6 h-6 transition-transform ${isActive ? 'scale-110' : ''}"></i>
